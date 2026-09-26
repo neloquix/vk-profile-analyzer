@@ -2,12 +2,30 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0,
+    shrink-to-fit=no, user-scalable=no, viewport-fit=cover"
+  >
   <title>VK Test</title>
 </head>
 
 <body>
   <h1>VK APP TEST</h1>
-  <p>если ты видишь этот текст, GitHub Pages работает</p>
+  <p id="status">загрузка VK Bridge...</p>
+
+  <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+
+  <script>
+    vkBridge.send('VKWebAppInit')
+      .then(() => {
+        document.getElementById('status').textContent =
+          'VK Bridge работает'
+      })
+      .catch((error) => {
+        document.getElementById('status').textContent =
+          'ошибка VK Bridge: ' + JSON.stringify(error)
+      })
+  </script>
 </body>
 </html>
