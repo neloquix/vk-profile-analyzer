@@ -1,1972 +1,2171 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>VK Profile Analyzer</title>
-<style>
-:root{
-  --bg:#f5f6f8;
-  --card:#fff;
-  --text:#17181a;
-  --muted:#73777d;
-  --line:#e4e6e9;
-  --accent:#447bba;
-  --accent2:#eaf2fb;
-  --danger:#d9534f;
-  --ok:#2e9b5f;
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
-button,input{font:inherit}
-button{cursor:pointer}
-.wrap{
-  width:min(1100px,100%);
-  margin:0 auto;
-  padding:16px;
-}
-.top{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:18px;
-  padding:18px;
-  margin-bottom:14px;
-}
-h1{
-  margin:0 0 6px;
-  font-size:25px;
-}
-.sub{
-  color:var(--muted);
-  font-size:14px;
-  line-height:1.45;
-}
-.search{
-  display:flex;
-  gap:8px;
-  margin-top:16px;
-}
-.search input{
-  flex:1;
-  min-width:0;
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:13px 14px;
-  background:#fff;
-  outline:none;
-}
-.search input:focus{
-  border-color:var(--accent);
-}
-.search button{
-  border:0;
-  border-radius:12px;
-  padding:0 18px;
-  background:var(--accent);
-  color:#fff;
-  font-weight:600;
-}
-.progress{
-  margin-top:12px;
-  height:8px;
-  background:#edf0f3;
-  border-radius:99px;
-  overflow:hidden;
-}
-.progress > div{
-  height:100%;
-  width:0;
-  background:var(--accent);
-  transition:width .2s;
-}
-.status{
-  margin-top:8px;
-  color:var(--muted);
-  font-size:13px;
-}
-.tabs{
-  display:flex;
-  gap:7px;
-  overflow:auto;
-  padding:4px 0 10px;
-  scrollbar-width:none;
-}
-.tabs::-webkit-scrollbar{display:none}
-.tab{
-  flex:0 0 auto;
-  border:1px solid var(--line);
-  background:#fff;
-  color:#555;
-  border-radius:10px;
-  padding:8px 11px;
-}
-.tab.active{
-  background:var(--accent2);
-  color:var(--accent);
-  border-color:#c8dcef;
-  font-weight:600;
-}
-.panel{
-  display:none;
-}
-.panel.active{
-  display:block;
-}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:12px;
-}
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:15px;
-  margin-bottom:12px;
-}
-.card h2{
-  margin:0 0 10px;
-  font-size:17px;
-}
-.card h3{
-  margin:0 0 7px;
-  font-size:15px;
-}
-.profile{
-  display:flex;
-  gap:15px;
-  align-items:flex-start;
-}
-.avatar{
-  width:100px;
-  height:100px;
-  border-radius:50%;
-  object-fit:cover;
-  background:#eee;
-  flex:0 0 auto;
-}
-.profile-main{
-  min-width:0;
-  flex:1;
-}
-.name{
-  font-size:22px;
-  font-weight:700;
-  word-break:break-word;
-}
-.meta{
-  color:var(--muted);
-  font-size:13px;
-  margin-top:4px;
-}
-.bio{
-  margin-top:10px;
-  line-height:1.5;
-  white-space:pre-wrap;
-  word-break:break-word;
-}
-.stats{
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:8px;
-}
-.stat{
-  background:#f7f8fa;
-  border-radius:12px;
-  padding:11px;
-}
-.stat .n{
-  font-size:20px;
-  font-weight:700;
-}
-.stat .l{
-  margin-top:2px;
-  color:var(--muted);
-  font-size:12px;
-}
-.item{
-  padding:12px 0;
-  border-bottom:1px solid var(--line);
-}
-.item:last-child{border-bottom:0}
-.item-title{
-  font-weight:600;
-  line-height:1.35;
-}
-.item-meta{
-  margin-top:5px;
-  color:var(--muted);
-  font-size:12px;
-}
-.item-text{
-  margin-top:8px;
-  line-height:1.5;
-  white-space:pre-wrap;
-  word-break:break-word;
-}
-a{
-  color:var(--accent);
-  text-decoration:none;
-}
-a:hover{text-decoration:underline}
-.chips{
-  display:flex;
-  flex-wrap:wrap;
-  gap:7px;
-}
-.chip{
-  background:#f0f2f5;
-  border-radius:999px;
-  padding:6px 9px;
-  font-size:12px;
-}
-.empty{
-  color:var(--muted);
-  padding:20px 0;
-  text-align:center;
-}
-.error{
-  color:var(--danger);
-  background:#fff1f0;
-  border:1px solid #ffd4d1;
-  border-radius:12px;
-  padding:12px;
-  line-height:1.45;
-}
-.ok{
-  color:var(--ok);
-}
-table{
-  width:100%;
-  border-collapse:collapse;
-  font-size:13px;
-}
-th,td{
-  text-align:left;
-  padding:8px;
-  border-bottom:1px solid var(--line);
-}
-pre{
-  white-space:pre-wrap;
-  word-break:break-word;
-}
-.search-link{
-  display:block;
-  padding:10px 0;
-  border-bottom:1px solid var(--line);
-}
-.search-link:last-child{border-bottom:0}
-.small{
-  font-size:12px;
-  color:var(--muted);
-}
-@media(max-width:700px){
-  .wrap{padding:10px}
-  .grid{grid-template-columns:1fr}
-  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .profile{align-items:center}
-  .avatar{width:78px;height:78px}
-  .name{font-size:19px}
-  .search{flex-direction:column}
-  .search button{height:46px}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+  <title>VK Profile Analyzer</title>
+
+  <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #f2f3f5;
+      --card: #ffffff;
+      --text: #17181a;
+      --muted: #818c99;
+      --line: #e1e3e6;
+      --accent: #447bba;
+      --accent-soft: #e8f1fb;
+      --green: #4caf50;
+      --yellow: #e5a900;
+      --red: #d84b4b;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .header {
+      margin-bottom: 16px;
+    }
+
+    .title {
+      font-size: 26px;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .search-box {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 14px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, .04);
+      margin-bottom: 14px;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 13px 14px;
+      outline: none;
+      background: #fff;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+    }
+
+    .primary-btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 0 18px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 46px;
+    }
+
+    .primary-btn:disabled {
+      opacity: .6;
+      cursor: default;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .status.error {
+      color: var(--red);
+    }
+
+    .profile-card {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, .04);
+    }
+
+    .profile-top {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .avatar {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #e5e7eb;
+      flex: 0 0 auto;
+    }
+
+    .profile-name {
+      font-size: 23px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .profile-screen {
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 5px 9px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .badge.gray {
+      background: #f0f1f3;
+      color: #626a73;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 14px;
+      scrollbar-width: thin;
+    }
+
+    .tab {
+      white-space: nowrap;
+      border: 0;
+      border-radius: 10px;
+      padding: 9px 12px;
+      background: #e5e7eb;
+      color: #454b52;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .tab.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 15px;
+      padding: 15px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .035);
+    }
+
+    .card-title {
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .field {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .field:last-child {
+      border-bottom: 0;
+    }
+
+    .field-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    .field-value {
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+
+    .empty {
+      background: var(--card);
+      border-radius: 15px;
+      padding: 22px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .post {
+      background: var(--card);
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 10px;
+    }
+
+    .post-date {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .post-text {
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.45;
+    }
+
+    .post-link {
+      display: block;
+      margin-top: 9px;
+      color: var(--accent);
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 8px;
+    }
+
+    .photo-grid img {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 10px;
+      display: block;
+      background: #ddd;
+    }
+
+    .person {
+      display: flex;
+      gap: 11px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .person:last-child {
+      border-bottom: 0;
+    }
+
+    .person img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #ddd;
+    }
+
+    .person-name {
+      font-weight: 700;
+    }
+
+    .person-link {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .group {
+      padding: 11px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .group:last-child {
+      border-bottom: 0;
+    }
+
+    .group-name {
+      font-weight: 700;
+    }
+
+    .group-link {
+      color: var(--accent);
+      font-size: 13px;
+      word-break: break-all;
+    }
+
+    .source {
+      background: var(--card);
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-left: 4px solid var(--accent);
+    }
+
+    .source.possible {
+      border-left-color: var(--yellow);
+    }
+
+    .source.profile {
+      border-left-color: var(--green);
+    }
+
+    .source-title {
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .source-desc {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .source-query {
+      background: #f4f5f6;
+      border-radius: 9px;
+      padding: 9px;
+      font-size: 12px;
+      word-break: break-word;
+      margin-bottom: 10px;
+    }
+
+    .source-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .source-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 8px 12px;
+      border-radius: 9px;
+      border: 0;
+      background: var(--accent);
+      color: white;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .source-btn.secondary {
+      background: #e9eaed;
+      color: #33383e;
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .timeline-date {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .timeline-content {
+      word-break: break-word;
+    }
+
+    .warning {
+      background: #fff7df;
+      color: #725700;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 13px;
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+
+    .danger {
+      background: #fff0f0;
+      color: #8d2929;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 13px;
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+
+    .history-item {
+      padding: 11px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .history-item:last-child {
+      border-bottom: 0;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .count {
+      font-size: 25px;
+      font-weight: 800;
+    }
+
+    @media (max-width: 650px) {
+      .app {
+        padding: 10px;
+      }
+
+      .search-row {
+        flex-direction: column;
+      }
+
+      .primary-btn {
+        width: 100%;
+      }
+
+      .profile-top {
+        align-items: center;
+      }
+
+      .avatar {
+        width: 78px;
+        height: 78px;
+      }
+
+      .profile-name {
+        font-size: 20px;
+      }
+
+      .timeline-item {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+    }
+  </style>
 </head>
 
 <body>
-<div class="wrap">
+<div class="app">
 
-<div class="top">
-  <h1>VK Profile Analyzer</h1>
-  <div class="sub">
-    анализ открытой информации VK без сервера и платных API
+  <div class="header">
+    <div class="title">VK Profile Analyzer</div>
+    <div class="subtitle">
+      анализ публичной информации профиля VK
+    </div>
   </div>
 
-  <div class="search">
-    <input id="profileInput" placeholder="https://vk.ru/id1 или короткое имя">
-    <button id="analyzeBtn">Анализировать</button>
-  </div>
-
-  <div class="progress">
-    <div id="progressBar"></div>
-  </div>
-
-  <div class="status" id="status">
-    готово к анализу
-  </div>
-</div>
-
-<div class="tabs" id="tabs">
-  <button class="tab active" data-tab="profile">профиль</button>
-  <button class="tab" data-tab="analytics">аналитика</button>
-  <button class="tab" data-tab="connections">связи</button>
-  <button class="tab" data-tab="groups">сообщества</button>
-  <button class="tab" data-tab="posts">посты</button>
-  <button class="tab" data-tab="photos">фото</button>
-  <button class="tab" data-tab="videos">видео</button>
-  <button class="tab" data-tab="audio">аудио</button>
-  <button class="tab" data-tab="docs">документы</button>
-  <button class="tab" data-tab="external">внешние источники</button>
-  <button class="tab" data-tab="links">ссылки</button>
-  <button class="tab" data-tab="timeline">таймлайн</button>
-  <button class="tab" data-tab="history">история</button>
-  <button class="tab" data-tab="limits">ограничения</button>
-</div>
-
-<section class="panel active" id="panel-profile">
-  <div id="profileContent">
-    <div class="card empty">здесь появится информация о профиле</div>
-  </div>
-</section>
-
-<section class="panel" id="panel-analytics">
-  <div id="analyticsContent">
-    <div class="card empty">сначала запусти анализ</div>
-  </div>
-</section>
-
-<section class="panel" id="panel-connections">
-  <div id="connectionsContent">
-    <div class="card empty">сначала запусти анализ</div>
-  </div>
-</section>
-
-<section class="panel" id="panel-groups">
-  <div id="groupsContent">
-    <div class="card empty">сначала запусти анализ</div>
-  </div>
-</section>
-
-<section class="panel" id="panel-posts">
-  <div id="postsContent">
-    <div class="card empty">сначала запусти анализ</div>
-  </div>
-</section>
-
-<section class="panel" id="panel-photos">
-  <div id="photosContent">
-    <div class="card empty">сначала запусти анализ</div>
-  </div>
-</section>
-
-<section class="panel" id="panel-videos">
-  <div id="videosContent">
-    <div class="card empty">сначала запусти анализ</div>
-  </div>
-</section>
-
-<section class="panel" id="panel-audio">
-  <div id="audioContent">
-    <div class="card empty">сначала запусти анализ</div>
-  </div>
-</section>
-
-<section class="panel" id="panel-docs">
-  <div id="docsContent">
-    <div class="card empty">сначала запусти анализ</div>
-  </div>
-</section>
-
-<section class="panel" id="panel-external">
-  <div id="externalContent">
-    <div class="card empty">сначала запусти анализ</div>
-  </div>
-</section>
-
-<section class="panel" id="panel-links">
-  <div id="linksContent">
-    <div class="card empty">сначала запусти анализ</div>
-  </div>
-</section>
-
-<section class="panel" id="panel-timeline">
-  <div id="timelineContent">
-    <div class="card empty">сначала запусти анализ</div>
-  </div>
-</section>
-
-<section class="panel" id="panel-history">
-  <div id="historyContent">
-    <div class="card empty">сохраненных анализов пока нет</div>
-  </div>
-</section>
-
-<section class="panel" id="panel-limits">
-  <div class="card">
-    <h2>что приложение не может получить</h2>
-
-    <div class="item">
-      <div class="item-title">закрытую информацию</div>
-      <div class="item-text">
-        приложение работает только с информацией, которую VK разрешает получить через официальный API и с открытыми публичными источниками
-      </div>
+  <div class="search-box">
+    <div class="search-row">
+      <input
+        id="profileInput"
+        class="search-input"
+        type="text"
+        placeholder="вставь ссылку на VK, например vk.ru/id123456"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+      >
+      <button id="analyzeBtn" class="primary-btn">
+        Анализировать
+      </button>
     </div>
 
-    <div class="item">
-      <div class="item-title">скрытых друзей</div>
-      <div class="item-text">
-        невозможно гарантированно получить скрытых друзей пользователя через обычный API
-      </div>
+    <div id="status" class="status">
+      готово к анализу
     </div>
+  </div>
 
-    <div class="item">
-      <div class="item-title">личные сообщения</div>
-      <div class="item-text">
-        приложение не получает переписки пользователя
-      </div>
-    </div>
-
-    <div class="item">
-      <div class="item-title">историю браузера</div>
-      <div class="item-text">
-        приложение не имеет доступа к истории браузера или содержимому устройства
-      </div>
-    </div>
-
-    <div class="item">
-      <div class="item-title">пароли и токены</div>
-      <div class="item-text">
-        приложение не получает пароли, cookies или чужие access token
-      </div>
-    </div>
-
-    <div class="item">
-      <div class="item-title">утечки и закрытые базы</div>
-      <div class="item-text">
-        приложение не использует слитые базы, украденные аккаунты или обход ограничений доступа
-      </div>
-    </div>
-
-    <div class="item">
-      <div class="item-title">точную идентификацию внешних аккаунтов</div>
-      <div class="item-text">
-        совпадение имени или username на другом сайте само по себе не доказывает, что аккаунт принадлежит этому человеку
+  <div id="profileCard" class="profile-card" style="display:none">
+    <div class="profile-top">
+      <img id="profileAvatar" class="avatar" src="" alt="">
+      <div style="min-width:0">
+        <div id="profileName" class="profile-name"></div>
+        <div id="profileScreen" class="profile-screen"></div>
+        <div id="profileBadges" class="badges"></div>
       </div>
     </div>
   </div>
-</section>
+
+  <div id="tabs" class="tabs" style="display:none">
+    <button class="tab active" data-tab="overview">профиль</button>
+    <button class="tab" data-tab="connections">связи</button>
+    <button class="tab" data-tab="communities">сообщества</button>
+    <button class="tab" data-tab="wall">посты</button>
+    <button class="tab" data-tab="photos">фото</button>
+    <button class="tab" data-tab="videos">видео</button>
+    <button class="tab" data-tab="audio">аудио</button>
+    <button class="tab" data-tab="docs">документы</button>
+    <button class="tab" data-tab="external">внешние источники</button>
+    <button class="tab" data-tab="mentions">ссылки и упоминания</button>
+    <button class="tab" data-tab="timeline">таймлайн</button>
+    <button class="tab" data-tab="history">история</button>
+    <button class="tab" data-tab="limits">ограничения</button>
+  </div>
+
+  <section id="section-overview" class="section active">
+    <div id="overview"></div>
+  </section>
+
+  <section id="section-connections" class="section">
+    <div id="connections"></div>
+  </section>
+
+  <section id="section-communities" class="section">
+    <div id="communities"></div>
+  </section>
+
+  <section id="section-wall" class="section">
+    <div id="wall"></div>
+  </section>
+
+  <section id="section-photos" class="section">
+    <div id="photos"></div>
+  </section>
+
+  <section id="section-videos" class="section">
+    <div id="videos"></div>
+  </section>
+
+  <section id="section-audio" class="section">
+    <div id="audio"></div>
+  </section>
+
+  <section id="section-docs" class="section">
+    <div id="docs"></div>
+  </section>
+
+  <section id="section-external" class="section">
+    <div id="external"></div>
+  </section>
+
+  <section id="section-mentions" class="section">
+    <div id="mentions"></div>
+  </section>
+
+  <section id="section-timeline" class="section">
+    <div id="timeline"></div>
+  </section>
+
+  <section id="section-history" class="section">
+    <div id="history"></div>
+  </section>
+
+  <section id="section-limits" class="section">
+    <div class="warning">
+      анализатор работает только с информацией, которую VK и другие публичные
+      источники позволяют получить законным способом
+    </div>
+
+    <div class="card">
+      <div class="card-title">что нельзя гарантированно получить</div>
+
+      <div class="field">
+        <div class="field-label">закрытые данные</div>
+        <div class="field-value">
+          приватные сообщения, скрытые фотографии, пароли, cookies, access token
+          другого пользователя и содержимое закрытых профилей
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">история</div>
+        <div class="field-value">
+          приложение не знает, что пользователь делал до первого запуска
+          анализатора, если эти данные не были публично доступны где-либо еще
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">внешние аккаунты</div>
+        <div class="field-value">
+          одинаковый username на разных сайтах не является доказательством,
+          что аккаунты принадлежат одному человеку
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">сообщества</div>
+        <div class="field-value">
+          VK может ограничивать получение списка групп другого пользователя
+        </div>
+      </div>
+    </div>
+  </section>
 
 </div>
-
-<script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 
 <script>
-const APP_ID = 54790628
-const API_VERSION = "5.199"
+  const bridge = window.vkBridge;
 
-let accessToken = null
-let currentUser = null
-let currentData = {
-  profile:null,
-  wallPosts:[],
-  comments:[],
-  photos:[],
-  videos:[],
-  audio:[],
-  docs:[],
-  friends:[],
-  followers:[],
-  subscriptions:[],
-  groups:[],
-  links:[],
-  mentions:[],
-  hashtags:[],
-  external:[],
-  timeline:[]
-}
+  let currentUser = null;
+  let currentData = {
+    profile: null,
+    wallPosts: [],
+    photos: [],
+    videos: [],
+    audio: [],
+    docs: [],
+    friends: [],
+    followers: [],
+    subscriptions: [],
+    groups: [],
+    links: [],
+    mentions: []
+  };
 
-const $ = id => document.getElementById(id)
+  let vkToken = null;
 
-function setStatus(text){
-  $("status").textContent = text
-}
+  const API_VERSION = "5.199";
 
-function setProgress(value){
-  $("progressBar").style.width = Math.max(0,Math.min(100,value)) + "%"
-}
+  function escapeHtml(value) {
+    if (value === null || value === undefined) return "";
 
-function esc(value){
-  return String(value ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;")
-}
-
-function fmtDate(ts){
-  if(!ts) return "неизвестно"
-  return new Date(ts*1000).toLocaleString("ru-RU")
-}
-
-function sleep(ms){
-  return new Promise(resolve => setTimeout(resolve,ms))
-}
-
-async function initVK(){
-  try{
-    await vkBridge.send("VKWebAppInit")
-    setStatus("VK Bridge подключен")
-  }catch(e){
-    setStatus("приложение открыто вне VK или VK Bridge недоступен")
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   }
-}
 
-async function getToken(){
-  if(accessToken) return accessToken
+  function setStatus(text, error = false) {
+    const el = document.getElementById("status");
+    el.textContent = text;
+    el.className = error ? "status error" : "status";
+  }
 
-  const result = await vkBridge.send("VKWebAppGetAuthToken",{
-    app_id:APP_ID,
-    scope:"friends,photos,audio,video,docs,groups"
-  })
+  function normalizeProfileInput(input) {
+    let value = String(input || "").trim();
 
-  accessToken = result.access_token
-  return accessToken
-}
+    if (!value) return null;
 
-async function api(method,params={}){
-  const token = await getToken()
+    value = value
+      .replace(/^https?:\/\/(www\.)?/i, "")
+      .replace(/^m\./i, "");
 
-  const result = await vkBridge.send("VKWebAppCallAPIMethod",{
-    method,
-    params:{
-      ...params,
-      access_token:token,
-      v:API_VERSION
+    if (value.startsWith("vk.ru/")) {
+      value = value.slice(6);
     }
-  })
 
-  if(result.response){
-    return result.response
+    if (value.startsWith("vk.com/")) {
+      value = value.slice(7);
+    }
+
+    value = value.split("?")[0].split("#")[0].replace(/\/+$/, "");
+
+    if (!value) return null;
+
+    if (/^id\d+$/i.test(value)) {
+      return value;
+    }
+
+    if (/^\d+$/.test(value)) {
+      return "id" + value;
+    }
+
+    return value.split("/")[0];
   }
 
-  if(result.error){
+  function isNumericId(value) {
+    return /^id\d+$/i.test(value || "");
+  }
+
+  async function initVK() {
+    try {
+      await bridge.send("VKWebAppInit");
+
+      const auth = await bridge.send("VKWebAppGetAuthToken", {
+        app_id: 54790628,
+        scope: ""
+      });
+
+      if (auth && auth.access_token) {
+        vkToken = auth.access_token;
+        setStatus("VK подключен, можно анализировать профиль");
+      } else {
+        setStatus("VK подключен, но токен не получен");
+      }
+    } catch (error) {
+      console.error(error);
+      setStatus("не удалось подключить VK Bridge", true);
+    }
+  }
+
+  async function api(method, params = {}) {
+    if (!vkToken) {
+      throw new Error("нет VK access token");
+    }
+
+    const response = await bridge.send("VKWebAppCallAPIMethod", {
+      method,
+      params: {
+        ...params,
+        access_token: vkToken,
+        v: API_VERSION
+      }
+    });
+
+    if (response && response.response !== undefined) {
+      return response.response;
+    }
+
     throw new Error(
-      "VK API " +
-      result.error.error_code +
-      ": " +
-      (result.error.error_msg || "ошибка")
-    )
+      response && response.error
+        ? response.error.error_msg || "VK API error"
+        : "VK API error"
+    );
   }
 
-  throw new Error("неизвестный ответ VK API")
-}
+  async function resolveUser(input) {
+    const normalized = normalizeProfileInput(input);
 
-function parseInput(value){
-  value = value.trim()
-
-  if(!value) throw new Error("введи ссылку или id профиля")
-
-  value = value.replace(/^https?:\/\/(www\.)?vk\.com\//i,"")
-  value = value.replace(/^https?:\/\/(www\.)?vk\.ru\//i,"")
-  value = value.split("?")[0].split("#")[0].replace(/^\/+/,"")
-
-  if(/^id\d+$/i.test(value)){
-    return {id:Number(value.replace(/\D/g,""))}
-  }
-
-  if(/^\d+$/.test(value)){
-    return {id:Number(value)}
-  }
-
-  return {screen_name:value}
-}
-
-async function resolveUser(value){
-  const parsed = parseInput(value)
-
-  const response = await api("users.get",{
-    user_ids:parsed.id || parsed.screen_name,
-    fields:[
-      "photo_200",
-      "photo_400_orig",
-      "city",
-      "country",
-      "bdate",
-      "sex",
-      "status",
-      "about",
-      "activities",
-      "interests",
-      "books",
-      "movies",
-      "music",
-      "games",
-      "site",
-      "followers_count",
-      "verified",
-      "last_seen",
-      "occupation",
-      "relation",
-      "contacts",
-      "education",
-      "universities",
-      "schools",
-      "screen_name"
-    ].join(",")
-  })
-
-  if(!response || !response[0]){
-    throw new Error("пользователь не найден")
-  }
-
-  return response[0]
-}
-
-async function paginate(method,params={},options={}){
-  const all = []
-  const pageSize = options.pageSize || 100
-  const maxPages = options.maxPages || 50
-
-  for(let page=0;page<maxPages;page++){
-    const offset = page * pageSize
-
-    const response = await api(method,{
-      ...params,
-      count:pageSize,
-      offset
-    })
-
-    const items = response.items || []
-
-    all.push(...items)
-
-    if(
-      items.length < pageSize ||
-      all.length >= (response.count || all.length)
-    ){
-      break
+    if (!normalized) {
+      throw new Error("введи ссылку или VK ID");
     }
 
-    await sleep(120)
+    const result = await api("users.get", {
+      user_ids: normalized,
+      fields: [
+        "photo_200",
+        "photo_400_orig",
+        "city",
+        "country",
+        "bdate",
+        "sex",
+        "status",
+        "about",
+        "activities",
+        "interests",
+        "books",
+        "movies",
+        "music",
+        "games",
+        "site",
+        "followers_count",
+        "verified",
+        "last_seen",
+        "occupation",
+        "relation",
+        "contacts",
+        "education",
+        "universities",
+        "schools",
+        "screen_name"
+      ].join(",")
+    });
+
+    if (!result || !result.length) {
+      throw new Error("профиль не найден");
+    }
+
+    return result[0];
   }
 
-  return all
-}
+  function formatDate(timestamp) {
+    if (!timestamp) return "неизвестно";
 
-async function loadWall(id){
-  return paginate(
-    "wall.get",
-    {owner_id:id},
-    {pageSize:100,maxPages:50}
-  )
-}
-
-async function loadComments(id,posts){
-  const result = []
-
-  const limitedPosts = posts
-    .filter(post => post.comments && post.comments.count)
-    .slice(0,35)
-
-  for(const post of limitedPosts){
-    try{
-      const comments = await paginate(
-        "wall.getComments",
-        {
-          owner_id:id,
-          post_id:post.id,
-          sort:"desc"
-        },
-        {
-          pageSize:100,
-          maxPages:5
-        }
-      )
-
-      for(const comment of comments){
-        result.push({
-          ...comment,
-          post_id:post.id
-        })
-      }
-    }catch(e){}
+    try {
+      return new Date(timestamp * 1000).toLocaleString("ru-RU");
+    } catch {
+      return "неизвестно";
+    }
   }
 
-  return result
-}
+  function textValue(value) {
+    if (value === null || value === undefined || value === "") {
+      return "не указано";
+    }
 
-async function loadPhotos(id){
-  try{
-    return await paginate(
-      "photos.getAll",
-      {
-        owner_id:id,
-        extended:1
-      },
-      {
-        pageSize:100,
-        maxPages:20
-      }
-    )
-  }catch(e){
-    return []
-  }
-}
-
-async function loadVideos(id){
-  try{
-    return await paginate(
-      "video.get",
-      {
-        owner_id:id,
-        extended:1
-      },
-      {
-        pageSize:100,
-        maxPages:20
-      }
-    )
-  }catch(e){
-    return []
-  }
-}
-
-async function loadAudio(id){
-  try{
-    return await paginate(
-      "audio.get",
-      {
-        owner_id:id
-      },
-      {
-        pageSize:100,
-        maxPages:20
-      }
-    )
-  }catch(e){
-    return []
-  }
-}
-
-async function loadDocs(id){
-  try{
-    return await paginate(
-      "docs.get",
-      {
-        owner_id:id
-      },
-      {
-        pageSize:100,
-        maxPages:20
-      }
-    )
-  }catch(e){
-    return []
-  }
-}
-
-async function loadFriends(id){
-  try{
-    return await paginate(
-      "friends.get",
-      {
-        user_id:id,
-        order:"hints"
-      },
-      {
-        pageSize:1000,
-        maxPages:10
-      }
-    )
-  }catch(e){
-    return []
-  }
-}
-
-async function loadFollowers(id){
-  try{
-    return await paginate(
-      "users.getFollowers",
-      {
-        user_id:id
-      },
-      {
-        pageSize:1000,
-        maxPages:20
-      }
-    )
-  }catch(e){
-    return []
-  }
-}
-
-async function loadSubscriptions(id){
-  try{
-    return await paginate(
-      "users.getSubscriptions",
-      {
-        user_id:id,
-        extended:1
-      },
-      {
-        pageSize:200,
-        maxPages:20
-      }
-    )
-  }catch(e){
-    return []
-  }
-}
-
-async function loadGroups(id){
-  try{
-    return await paginate(
-      "groups.get",
-      {
-        user_id:id,
-        extended:1
-      },
-      {
-        pageSize:1000,
-        maxPages:20
-      }
-    )
-  }catch(e){
-    return []
-  }
-}
-
-function extractTextData(posts,comments){
-  const links = []
-  const mentions = []
-  const hashtags = []
-
-  const process = text => {
-    if(!text) return
-
-    const urls = text.match(
-      /https?:\/\/[^\s]+/gi
-    ) || []
-
-    links.push(...urls)
-
-    const ms = text.match(
-      /@[a-zA-Z0-9_.]+/g
-    ) || []
-
-    mentions.push(...ms)
-
-    const hs = text.match(
-      /#[\p{L}\p{N}_-]+/gu
-    ) || []
-
-    hashtags.push(...hs)
+    return value;
   }
 
-  posts.forEach(x => process(x.text))
-  comments.forEach(x => process(x.text))
+  function occupationText(occupation) {
+    if (!occupation) return "не указано";
 
-  return {
-    links:[...new Set(links)],
-    mentions,
-    hashtags
-  }
-}
-
-function normalizeText(text){
-  return String(text || "")
-    .toLowerCase()
-    .replace(/https?:\/\/\S+/g," ")
-    .replace(/@[a-z0-9_.]+/gi," ")
-    .replace(/#[\p{L}\p{N}_-]+/gu," ")
-    .replace(/[^\p{L}\p{N}\s-]/gu," ")
-}
-
-const stopWords = new Set([
-  "это","как","что","так","для","при","или","если","уже","еще",
-  "меня","тебя","себя","когда","только","мне","тебе","мы","вы",
-  "они","он","она","оно","быть","был","была","были","есть",
-  "the","and","for","you","with","this","that","from","have",
-  "are","was","were","not","but","can","all","just"
-])
-
-function wordStats(posts,comments){
-  const text = [
-    ...posts.map(x=>x.text || ""),
-    ...comments.map(x=>x.text || "")
-  ].join(" ")
-
-  const words = normalizeText(text)
-    .split(/\s+/)
-    .map(x=>x.trim())
-    .filter(x=>x.length>=3)
-    .filter(x=>!stopWords.has(x))
-
-  const map = new Map()
-
-  for(const word of words){
-    map.set(word,(map.get(word)||0)+1)
+    return [
+      occupation.type,
+      occupation.name,
+      occupation.city
+    ].filter(Boolean).join(" · ") || "не указано";
   }
 
-  return [...map.entries()]
-    .sort((a,b)=>b[1]-a[1])
-    .slice(0,50)
-}
+  function relationText(value) {
+    const map = {
+      1: "не женат / не замужем",
+      2: "есть партнер",
+      3: "помолвлен / помолвлена",
+      4: "женат / замужем",
+      5: "все сложно",
+      6: "в активном поиске",
+      7: "влюблен / влюблена",
+      8: "в гражданском браке"
+    };
 
-function domainStats(links){
-  const map = new Map()
-
-  for(const url of links){
-    try{
-      const host = new URL(url).hostname
-        .replace(/^www\./,"")
-
-      map.set(host,(map.get(host)||0)+1)
-    }catch(e){}
+    return map[value] || "не указано";
   }
 
-  return [...map.entries()]
-    .sort((a,b)=>b[1]-a[1])
-}
-
-function activityStats(posts,comments){
-  const hours = Array(24).fill(0)
-  const days = Array(7).fill(0)
-  const months = new Map()
-
-  const add = ts => {
-    if(!ts) return
-
-    const d = new Date(ts*1000)
-
-    hours[d.getHours()]++
-    days[(d.getDay()+6)%7]++
-
-    const key =
-      d.getFullYear() +
-      "-" +
-      String(d.getMonth()+1).padStart(2,"0")
-
-    months.set(key,(months.get(key)||0)+1)
+  function sexText(value) {
+    if (value === 1) return "женский";
+    if (value === 2) return "мужской";
+    return "не указан";
   }
 
-  posts.forEach(x=>add(x.date))
-  comments.forEach(x=>add(x.date))
+  function renderProfile(user) {
+    currentUser = user;
 
-  return {
-    hours,
-    days,
-    months:[...months.entries()].sort()
-  }
-}
+    document.getElementById("profileCard").style.display = "block";
+    document.getElementById("tabs").style.display = "flex";
 
-function analytics(){
-  const textData = extractTextData(
-    currentData.wallPosts,
-    currentData.comments
-  )
+    document.getElementById("profileAvatar").src =
+      user.photo_200 || user.photo_400_orig || "";
 
-  const words = wordStats(
-    currentData.wallPosts,
-    currentData.comments
-  )
+    document.getElementById("profileName").textContent =
+      `${user.first_name || ""} ${user.last_name || ""}`.trim();
 
-  const domains = domainStats(textData.links)
+    document.getElementById("profileScreen").textContent =
+      user.screen_name
+        ? `@${user.screen_name} · id${user.id}`
+        : `id${user.id}`;
 
-  const activity = activityStats(
-    currentData.wallPosts,
-    currentData.comments
-  )
+    const badges = [];
 
-  currentData.links = textData.links
-  currentData.mentions = textData.mentions
-  currentData.hashtags = textData.hashtags
+    if (user.verified) {
+      badges.push(`<span class="badge">верифицирован</span>`);
+    }
 
-  return {
-    words,
-    domains,
-    activity
-  }
-}
+    if (user.is_closed) {
+      badges.push(`<span class="badge gray">закрытый профиль</span>`);
+    } else {
+      badges.push(`<span class="badge gray">открытый профиль</span>`);
+    }
 
-function renderProfile(){
-  const u = currentData.profile
+    if (user.deactivated) {
+      badges.push(
+        `<span class="badge gray">${escapeHtml(user.deactivated)}</span>`
+      );
+    }
 
-  if(!u){
-    $("profileContent").innerHTML =
-      '<div class="card empty">нет данных</div>'
-    return
-  }
+    document.getElementById("profileBadges").innerHTML = badges.join("");
 
-  const city = u.city?.title || ""
-  const country = u.country?.title || ""
+    document.getElementById("overview").innerHTML = `
+      <div class="grid">
 
-  $("profileContent").innerHTML = `
-    <div class="card">
-      <div class="profile">
-        <img
-          class="avatar"
-          src="${esc(u.photo_200)}"
-          alt=""
-        >
+        <div class="card">
+          <div class="card-title">основное</div>
 
-        <div class="profile-main">
-          <div class="name">
-            ${esc(u.first_name)} ${esc(u.last_name)}
-            ${u.verified ? " ✓" : ""}
-          </div>
-
-          <div class="meta">
-            id${u.id}
-            ${u.screen_name ? " · " + esc(u.screen_name) : ""}
-          </div>
-
-          <div class="meta">
-            ${esc(city)}
-            ${city && country ? ", " : ""}
-            ${esc(country)}
-          </div>
-
-          <div class="meta">
-            подписчики: ${u.followers_count ?? "—"}
-          </div>
-
-          ${
-            u.last_seen
-              ? `<div class="meta">был(а): ${fmtDate(u.last_seen.time)}</div>`
-              : ""
-          }
+          ${field("VK ID", user.id)}
+          ${field("имя", `${user.first_name || ""} ${user.last_name || ""}`)}
+          ${field("screen name", user.screen_name ? "@" + user.screen_name : null)}
+          ${field("пол", sexText(user.sex))}
+          ${field("дата рождения", user.bdate)}
+          ${field("город", user.city?.title)}
+          ${field("страна", user.country?.title)}
+          ${field("подписчики", user.followers_count)}
+          ${field("последний онлайн", user.last_seen?.time ? formatDate(user.last_seen.time) : null)}
+          ${field("отношения", relationText(user.relation))}
+          ${field("занятость", occupationText(user.occupation))}
         </div>
+
+        <div class="card">
+          <div class="card-title">интересы и информация</div>
+
+          ${field("статус", user.status)}
+          ${field("о себе", user.about)}
+          ${field("деятельность", user.activities)}
+          ${field("интересы", user.interests)}
+          ${field("книги", user.books)}
+          ${field("фильмы", user.movies)}
+          ${field("музыка", user.music)}
+          ${field("игры", user.games)}
+          ${field("сайт", user.site)}
+        </div>
+
+        <div class="card">
+          <div class="card-title">образование</div>
+
+          ${field(
+            "университеты",
+            (user.universities || [])
+              .map(x => x.name)
+              .filter(Boolean)
+              .join(", ")
+          )}
+
+          ${field(
+            "школы",
+            (user.schools || [])
+              .map(x => x.name)
+              .filter(Boolean)
+              .join(", ")
+          )}
+        </div>
+
+        <div class="card">
+          <div class="card-title">контакты</div>
+
+          ${field("телефон", user.contacts?.mobile_phone)}
+          ${field("другой телефон", user.contacts?.home_phone)}
+          ${field("Skype", user.contacts?.skype)}
+          ${field("Facebook", user.contacts?.facebook)}
+          ${field("Instagram", user.contacts?.instagram)}
+        </div>
+
       </div>
+    `;
+  }
 
-      ${
-        u.status
-          ? `<div class="bio">${esc(u.status)}</div>`
-          : ""
-      }
+  function field(label, value) {
+    if (
+      value === null ||
+      value === undefined ||
+      value === ""
+    ) {
+      return `
+        <div class="field">
+          <div class="field-label">${escapeHtml(label)}</div>
+          <div class="field-value small">не указано</div>
+        </div>
+      `;
+    }
 
-      ${
-        u.about
-          ? `
-            <div class="item">
-              <div class="item-title">о себе</div>
-              <div class="item-text">${esc(u.about)}</div>
+    return `
+      <div class="field">
+        <div class="field-label">${escapeHtml(label)}</div>
+        <div class="field-value">${escapeHtml(value)}</div>
+      </div>
+    `;
+  }
+
+  async function loadWall(userId) {
+    try {
+      const result = await api("wall.get", {
+        owner_id: userId,
+        count: 100,
+        extended: 1
+      });
+
+      currentData.wallPosts = result.items || [];
+
+      renderWall(currentData.wallPosts);
+
+      return result;
+    } catch (error) {
+      console.error("wall", error);
+
+      document.getElementById("wall").innerHTML = `
+        <div class="empty">
+          не удалось получить публичную стену<br>
+          <span class="small">${escapeHtml(error.message)}</span>
+        </div>
+      `;
+
+      return null;
+    }
+  }
+
+  function renderWall(posts) {
+    if (!posts.length) {
+      document.getElementById("wall").innerHTML =
+        `<div class="empty">публичных постов не найдено</div>`;
+      return;
+    }
+
+    document.getElementById("wall").innerHTML = posts
+      .map(post => {
+        const links = extractLinksFromText(post.text || "");
+
+        return `
+          <article class="post">
+            <div class="post-date">
+              ${formatDate(post.date)}
             </div>
-          `
-          : ""
-      }
 
-      <div class="stats" style="margin-top:14px">
-        <div class="stat">
-          <div class="n">${currentData.wallPosts.length}</div>
-          <div class="l">постов</div>
-        </div>
-
-        <div class="stat">
-          <div class="n">${currentData.friends.length}</div>
-          <div class="l">друзей</div>
-        </div>
-
-        <div class="stat">
-          <div class="n">${currentData.followers.length}</div>
-          <div class="l">подписчиков получено</div>
-        </div>
-
-        <div class="stat">
-          <div class="n">${currentData.groups.length}</div>
-          <div class="l">сообществ</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="grid">
-      ${simpleField("деятельность",u.activities)}
-      ${simpleField("интересы",u.interests)}
-      ${simpleField("любимые книги",u.books)}
-      ${simpleField("любимые фильмы",u.movies)}
-      ${simpleField("любимая музыка",u.music)}
-      ${simpleField("игры",u.games)}
-      ${simpleField("сайт",u.site)}
-      ${simpleField("дата рождения",u.bdate)}
-    </div>
-  `
-}
-
-function simpleField(title,value){
-  if(!value) return ""
-
-  return `
-    <div class="card">
-      <h2>${esc(title)}</h2>
-      <div class="item-text">${esc(value)}</div>
-    </div>
-  `
-}
-
-function renderAnalytics(){
-  const a = analytics()
-
-  const hours = a.activity.hours
-    .map((x,i)=>`${String(i).padStart(2,"0")}:00 — ${x}`)
-    .join("<br>")
-
-  const daysNames = [
-    "понедельник",
-    "вторник",
-    "среда",
-    "четверг",
-    "пятница",
-    "суббота",
-    "воскресенье"
-  ]
-
-  const days = a.activity.days
-    .map((x,i)=>`${daysNames[i]} — ${x}`)
-    .join("<br>")
-
-  const months = a.activity.months
-    .map(([x,n])=>`${x} — ${n}`)
-    .join("<br>")
-
-  $("analyticsContent").innerHTML = `
-    <div class="grid">
-      <div class="card">
-        <h2>сводка</h2>
-        <div class="stats">
-          <div class="stat">
-            <div class="n">${currentData.wallPosts.length}</div>
-            <div class="l">постов</div>
-          </div>
-          <div class="stat">
-            <div class="n">${currentData.comments.length}</div>
-            <div class="l">комментариев</div>
-          </div>
-          <div class="stat">
-            <div class="n">${currentData.photos.length}</div>
-            <div class="l">фото</div>
-          </div>
-          <div class="stat">
-            <div class="n">${currentData.videos.length}</div>
-            <div class="l">видео</div>
-          </div>
-          <div class="stat">
-            <div class="n">${currentData.audio.length}</div>
-            <div class="l">аудио</div>
-          </div>
-          <div class="stat">
-            <div class="n">${currentData.docs.length}</div>
-            <div class="l">документов</div>
-          </div>
-          <div class="stat">
-            <div class="n">${currentData.links.length}</div>
-            <div class="l">ссылок</div>
-          </div>
-          <div class="stat">
-            <div class="n">${currentData.hashtags.length}</div>
-            <div class="l">хэштегов</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>частые слова</h2>
-        ${
-          a.words.length
-            ? `<div class="chips">
-                ${a.words
-                  .map(([word,n])=>
-                    `<span class="chip">${esc(word)} × ${n}</span>`
-                  )
-                  .join("")}
-              </div>`
-            : '<div class="empty">нет текста для анализа</div>'
-        }
-      </div>
-
-      <div class="card">
-        <h2>домены</h2>
-        ${
-          a.domains.length
-            ? a.domains
-                .slice(0,30)
-                .map(([d,n])=>`
-                  <div class="item">
-                    <b>${esc(d)}</b>
-                    <span class="small"> — ${n}</span>
-                  </div>
-                `)
-                .join("")
-            : '<div class="empty">ссылок нет</div>'
-        }
-      </div>
-
-      <div class="card">
-        <h2>активность по часам</h2>
-        <div class="small">${hours}</div>
-      </div>
-
-      <div class="card">
-        <h2>активность по дням</h2>
-        <div class="small">${days}</div>
-      </div>
-
-      <div class="card">
-        <h2>активность по месяцам</h2>
-        <div class="small">${months || "нет данных"}</div>
-      </div>
-    </div>
-  `
-}
-
-function renderConnections(){
-  const friends = currentData.friends
-    .slice(0,100)
-    .map(f=>`
-      <div class="item">
-        <div class="item-title">
-          ${esc(f.first_name || "")}
-          ${esc(f.last_name || "")}
-        </div>
-        <div class="item-meta">id${f.id}</div>
-      </div>
-    `)
-    .join("")
-
-  const followers = currentData.followers
-    .slice(0,100)
-    .map(id=>`
-      <div class="item">
-        <div class="item-title">id${esc(id)}</div>
-      </div>
-    `)
-    .join("")
-
-  $("connectionsContent").innerHTML = `
-    <div class="grid">
-      <div class="card">
-        <h2>друзья</h2>
-        ${
-          friends ||
-          '<div class="empty">друзья не получены</div>'
-        }
-      </div>
-
-      <div class="card">
-        <h2>подписчики</h2>
-        ${
-          followers ||
-          '<div class="empty">подписчики не получены</div>'
-        }
-      </div>
-    </div>
-  `
-}
-
-function renderGroups(){
-  const groups = currentData.groups
-
-  $("groupsContent").innerHTML = `
-    <div class="card">
-      <h2>сообщества и подписки</h2>
-
-      ${
-        groups.length
-          ? groups
-              .slice(0,500)
-              .map(g=>`
-                <div class="item">
-                  <div class="item-title">
-                    ${esc(g.name || g.screen_name || ("id"+g.id))}
-                  </div>
-
-                  <div class="item-meta">
-                    ${g.id ? "club"+g.id : ""}
-                  </div>
-                </div>
-              `)
-              .join("")
-          : '<div class="empty">сообщества не получены</div>'
-      }
-    </div>
-  `
-}
-
-function renderPosts(){
-  const posts = currentData.wallPosts
-
-  $("postsContent").innerHTML = `
-    <div class="card">
-      <h2>посты: ${posts.length}</h2>
-
-      ${
-        posts.length
-          ? posts
-              .slice(0,500)
-              .map(p=>`
-                <div class="item">
-                  <div class="item-meta">
-                    ${fmtDate(p.date)}
-                    · id${p.id}
-                  </div>
-
-                  ${
-                    p.text
-                      ? `<div class="item-text">${esc(p.text)}</div>`
-                      : '<div class="small">без текста</div>'
-                  }
-
-                  <div class="item-meta">
-                    лайки: ${p.likes?.count ?? 0}
-                    · комментарии: ${p.comments?.count ?? 0}
-                    · репосты: ${p.reposts?.count ?? 0}
-                    · просмотры: ${p.views?.count ?? 0}
-                  </div>
-                </div>
-              `)
-              .join("")
-          : '<div class="empty">постов нет</div>'
-      }
-    </div>
-
-    ${
-      currentData.comments.length
-        ? `
-          <div class="card">
-            <h2>найденные комментарии: ${currentData.comments.length}</h2>
-
-            ${currentData.comments
-              .slice(0,120)
-              .map(c=>`
-                <div class="item">
-                  <div class="item-meta">
-                    ${fmtDate(c.date)}
-                    · пост ${c.post_id}
-                  </div>
-                  <div class="item-text">${esc(c.text || "")}</div>
-                </div>
-              `)
-              .join("")
+            ${
+              post.text
+                ? `<div class="post-text">${escapeHtml(post.text)}</div>`
+                : `<div class="small">пост без текста</div>`
             }
-          </div>
-        `
-        : ""
-    }
-  `
-}
 
-function renderPhotos(){
-  $("photosContent").innerHTML = `
-    <div class="card">
-      <h2>фотографии: ${currentData.photos.length}</h2>
+            ${
+              links.length
+                ? links.map(link => `
+                    <a
+                      class="post-link"
+                      href="${escapeHtml(link)}"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >${escapeHtml(link)}</a>
+                  `).join("")
+                : ""
+            }
 
-      ${
-        currentData.photos.length
-          ? currentData.photos
-              .slice(0,300)
-              .map(p=>`
-                <div class="item">
-                  <div class="item-title">
-                    ${esc(p.text || "фото")}
-                  </div>
-
-                  <div class="item-meta">
-                    ${fmtDate(p.date)}
-                    · id${p.id}
-                  </div>
-
-                  ${
-                    p.sizes?.length
-                      ? `
-                        <a
-                          href="${esc(p.sizes[p.sizes.length-1].url)}"
-                          target="_blank"
-                          rel="noopener"
-                        >
-                          открыть фото
-                        </a>
-                      `
-                      : ""
-                  }
-                </div>
-              `)
-              .join("")
-          : '<div class="empty">фото не получены</div>'
-      }
-    </div>
-  `
-}
-
-function renderVideos(){
-  $("videosContent").innerHTML = `
-    <div class="card">
-      <h2>видео: ${currentData.videos.length}</h2>
-
-      ${
-        currentData.videos.length
-          ? currentData.videos
-              .slice(0,300)
-              .map(v=>`
-                <div class="item">
-                  <div class="item-title">
-                    ${esc(v.title || "без названия")}
-                  </div>
-
-                  <div class="item-meta">
-                    ${fmtDate(v.date)}
-                    · просмотры: ${v.views ?? 0}
-                  </div>
-                </div>
-              `)
-              .join("")
-          : '<div class="empty">видео не получены</div>'
-      }
-    </div>
-  `
-}
-
-function renderAudio(){
-  $("audioContent").innerHTML = `
-    <div class="card">
-      <h2>аудио: ${currentData.audio.length}</h2>
-
-      ${
-        currentData.audio.length
-          ? currentData.audio
-              .slice(0,500)
-              .map(a=>`
-                <div class="item">
-                  <div class="item-title">
-                    ${esc(a.artist || "")}
-                    ${a.artist && a.title ? " — " : ""}
-                    ${esc(a.title || "")}
-                  </div>
-
-                  <div class="item-meta">
-                    ${a.duration ? Math.round(a.duration/60)+" мин" : ""}
-                  </div>
-                </div>
-              `)
-              .join("")
-          : '<div class="empty">аудио не получено</div>'
-      }
-    </div>
-  `
-}
-
-function renderDocs(){
-  $("docsContent").innerHTML = `
-    <div class="card">
-      <h2>документы: ${currentData.docs.length}</h2>
-
-      ${
-        currentData.docs.length
-          ? currentData.docs
-              .slice(0,300)
-              .map(d=>`
-                <div class="item">
-                  <div class="item-title">
-                    ${esc(d.title || "документ")}
-                  </div>
-
-                  <div class="item-meta">
-                    ${d.ext ? "."+esc(d.ext) : ""}
-                    ${d.size ? " · "+d.size+" байт" : ""}
-                  </div>
-                </div>
-              `)
-              .join("")
-          : '<div class="empty">документы не получены</div>'
-      }
-    </div>
-  `
-}
-
-function externalSources(){
-  const u = currentData.profile
-
-  if(!u) return []
-
-  const name =
-    `${u.first_name || ""} ${u.last_name || ""}`.trim()
-
-  const username =
-    u.screen_name || `id${u.id}`
-
-  const q = encodeURIComponent(name)
-  const userQ = encodeURIComponent(username)
-
-  const sources = [
-    ["Google — имя",
-      `https://www.google.com/search?q=${q}`],
-
-    ["Google — username",
-      `https://www.google.com/search?q=${userQ}`],
-
-    ["GitHub",
-      `https://www.google.com/search?q=site%3Agithub.com+${userQ}`],
-
-    ["Reddit",
-      `https://www.google.com/search?q=site%3Areddit.com+${userQ}`],
-
-    ["Telegram",
-      `https://www.google.com/search?q=site%3At.me+${userQ}`],
-
-    ["YouTube",
-      `https://www.google.com/search?q=site%3Ayoutube.com+${userQ}`],
-
-    ["Twitch",
-      `https://www.google.com/search?q=site%3Atwitch.tv+${userQ}`],
-
-    ["X",
-      `https://www.google.com/search?q=site%3Ax.com+${userQ}`],
-
-    ["Instagram",
-      `https://www.google.com/search?q=site%3Ainstagram.com+${userQ}`],
-
-    ["TikTok",
-      `https://www.google.com/search?q=site%3Atiktok.com+${userQ}`],
-
-    ["LinkedIn",
-      `https://www.google.com/search?q=site%3Alinkedin.com+${userQ}`],
-
-    ["Behance",
-      `https://www.google.com/search?q=site%3Abehance.net+${userQ}`],
-
-    ["Dribbble",
-      `https://www.google.com/search?q=site%3Adribbble.com+${userQ}`],
-
-    ["Steam",
-      `https://www.google.com/search?q=site%3Asteamcommunity.com+${userQ}`
-    ]
-  ]
-
-  return sources
-}
-
-function renderExternal(){
-  const sources = externalSources()
-
-  const postLinks = currentData.links
-    .slice(0,100)
-    .map(url=>`
-      <a
-        class="search-link"
-        href="${esc(url)}"
-        target="_blank"
-        rel="noopener"
-      >
-        ${esc(url)}
-      </a>
-    `)
-    .join("")
-
-  $("externalContent").innerHTML = `
-    <div class="card">
-      <h2>внешние источники</h2>
-
-      <div class="small" style="margin-bottom:10px">
-        эти ссылки открывают публичный поиск и не доказывают принадлежность найденного аккаунта человеку
-      </div>
-
-      ${sources.map(([name,url])=>`
-        <a
-          class="search-link"
-          href="${esc(url)}"
-          target="_blank"
-          rel="noopener"
-        >
-          ${esc(name)}
-        </a>
-      `).join("")}
-    </div>
-
-    ${
-      postLinks
-        ? `
-          <div class="card">
-            <h2>ссылки из постов</h2>
-            ${postLinks}
-          </div>
-        `
-        : ""
-    }
-  `
-}
-
-function renderLinks(){
-  const all = [
-    ...currentData.links.map(x=>({
-      type:"ссылка",
-      value:x
-    })),
-    ...currentData.mentions.map(x=>({
-      type:"упоминание",
-      value:x
-    })),
-    ...currentData.hashtags.map(x=>({
-      type:"хэштег",
-      value:x
-    }))
-  ]
-
-  $("linksContent").innerHTML = `
-    <div class="card">
-      <h2>ссылки, упоминания и хэштеги</h2>
-
-      ${
-        all.length
-          ? all
-              .slice(0,500)
-              .map(x=>`
-                <div class="item">
-                  <div class="item-meta">${esc(x.type)}</div>
-                  <div class="item-text">${esc(x.value)}</div>
-                </div>
-              `)
-              .join("")
-          : '<div class="empty">ничего не найдено</div>'
-      }
-    </div>
-  `
-}
-
-function buildTimeline(){
-  const timeline = []
-
-  for(const p of currentData.wallPosts){
-    timeline.push({
-      date:p.date,
-      type:"пост",
-      id:p.id,
-      text:p.text || ""
-    })
+            <div class="small" style="margin-top:10px">
+              просмотры: ${post.views?.count ?? "—"}
+              · лайки: ${post.likes?.count ?? "—"}
+              · комментарии: ${post.comments?.count ?? "—"}
+              · репосты: ${post.reposts?.count ?? "—"}
+            </div>
+          </article>
+        `;
+      })
+      .join("");
   }
 
-  for(const c of currentData.comments){
-    timeline.push({
-      date:c.date,
-      type:"комментарий",
-      id:c.id,
-      text:c.text || ""
-    })
-  }
+  async function loadPhotos(userId) {
+    try {
+      const result = await api("photos.getAll", {
+        owner_id: userId,
+        extended: 1,
+        count: 100
+      });
 
-  timeline.sort((a,b)=>b.date-a.date)
+      currentData.photos = result.items || [];
 
-  return timeline
-}
-
-function renderTimeline(){
-  currentData.timeline = buildTimeline()
-
-  $("timelineContent").innerHTML = `
-    <div class="card">
-      <h2>таймлайн</h2>
-
-      ${
-        currentData.timeline.length
-          ? currentData.timeline
-              .slice(0,500)
-              .map(x=>`
-                <div class="item">
-                  <div class="item-title">
-                    ${esc(x.type)}
-                  </div>
-
-                  <div class="item-meta">
-                    ${fmtDate(x.date)}
-                    · id${x.id}
-                  </div>
-
-                  ${
-                    x.text
-                      ? `<div class="item-text">${esc(x.text)}</div>`
-                      : ""
-                  }
-                </div>
-              `)
-              .join("")
-          : '<div class="empty">нет событий</div>'
+      if (!currentData.photos.length) {
+        document.getElementById("photos").innerHTML =
+          `<div class="empty">публичные фотографии не найдены</div>`;
+        return;
       }
-    </div>
-  `
-}
 
-function saveSnapshot(){
-  if(!currentData.profile) return
+      document.getElementById("photos").innerHTML = `
+        <div class="photo-grid">
+          ${currentData.photos.map(photo => `
+            <a
+              href="${escapeHtml(photo.sizes?.at(-1)?.url || photo.photo_604 || photo.photo_130 || "#")}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="${escapeHtml(photo.sizes?.at(-1)?.url || photo.photo_604 || photo.photo_130 || "")}"
+                alt="VK photo"
+                loading="lazy"
+              >
+            </a>
+          `).join("")}
+        </div>
+      `;
+    } catch (error) {
+      console.error("photos", error);
 
-  const key = "vk_analyzer_history"
-
-  let history = []
-
-  try{
-    history = JSON.parse(
-      localStorage.getItem(key) || "[]"
-    )
-  }catch(e){
-    history = []
-  }
-
-  const snapshot = {
-    savedAt:Date.now(),
-    profile:{
-      id:currentData.profile.id,
-      first_name:currentData.profile.first_name,
-      last_name:currentData.profile.last_name,
-      screen_name:currentData.profile.screen_name
-    },
-    counts:{
-      posts:currentData.wallPosts.length,
-      comments:currentData.comments.length,
-      photos:currentData.photos.length,
-      videos:currentData.videos.length,
-      audio:currentData.audio.length,
-      docs:currentData.docs.length,
-      friends:currentData.friends.length,
-      followers:currentData.followers.length,
-      groups:currentData.groups.length
+      document.getElementById("photos").innerHTML = `
+        <div class="empty">
+          фотографии недоступны через текущие разрешения VK
+        </div>
+      `;
     }
   }
 
-  history.unshift(snapshot)
-  history = history.slice(0,100)
+  async function loadVideos(userId) {
+    try {
+      const result = await api("video.get", {
+        owner_id: userId,
+        count: 100
+      });
 
-  localStorage.setItem(
-    key,
-    JSON.stringify(history)
-  )
+      currentData.videos = result.items || [];
 
-  renderHistory()
-}
+      if (!currentData.videos.length) {
+        document.getElementById("videos").innerHTML =
+          `<div class="empty">публичные видео не найдены</div>`;
+        return;
+      }
 
-function renderHistory(){
-  const key = "vk_analyzer_history"
+      document.getElementById("videos").innerHTML = `
+        <div class="grid">
+          ${currentData.videos.map(video => `
+            <div class="card">
+              <div class="card-title">
+                ${escapeHtml(video.title || "без названия")}
+              </div>
 
-  let history = []
+              <div class="small">
+                ${escapeHtml(video.description || "без описания")}
+              </div>
 
-  try{
-    history = JSON.parse(
-      localStorage.getItem(key) || "[]"
-    )
-  }catch(e){}
+              <div class="small" style="margin-top:8px">
+                ${video.date ? formatDate(video.date) : ""}
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    } catch (error) {
+      console.error("videos", error);
 
-  $("historyContent").innerHTML = `
-    <div class="card">
-      <h2>локальная история анализов</h2>
+      document.getElementById("videos").innerHTML = `
+        <div class="empty">
+          видео недоступны через текущие разрешения VK
+        </div>
+      `;
+    }
+  }
 
-      <div class="small">
-        история хранится только в этом браузере и на этом устройстве
-      </div>
+  async function loadAudio(userId) {
+    try {
+      const result = await api("audio.get", {
+        owner_id: userId,
+        count: 100
+      });
 
-      ${
-        history.length
-          ? history.map(x=>`
-              <div class="item">
-                <div class="item-title">
-                  ${esc(
-                    x.profile.first_name +
-                    " " +
-                    x.profile.last_name
-                  )}
-                </div>
+      currentData.audio = result.items || [];
 
-                <div class="item-meta">
-                  ${new Date(x.savedAt).toLocaleString("ru-RU")}
-                  · id${x.profile.id}
-                </div>
+      if (!currentData.audio.length) {
+        document.getElementById("audio").innerHTML =
+          `<div class="empty">аудиозаписи не найдены или недоступны</div>`;
+        return;
+      }
 
-                <div class="small" style="margin-top:6px">
-                  посты ${x.counts.posts}
-                  · комментарии ${x.counts.comments}
-                  · фото ${x.counts.photos}
-                  · видео ${x.counts.videos}
-                  · друзья ${x.counts.friends}
-                  · группы ${x.counts.groups}
+      document.getElementById("audio").innerHTML = `
+        <div class="grid">
+          ${currentData.audio.map(track => `
+            <div class="card">
+              <div class="card-title">
+                ${escapeHtml(track.artist || "неизвестный исполнитель")}
+              </div>
+
+              <div>
+                ${escapeHtml(track.title || "без названия")}
+              </div>
+
+              ${
+                track.url
+                  ? `
+                    <a
+                      class="post-link"
+                      href="${escapeHtml(track.url)}"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >открыть</a>
+                  `
+                  : ""
+              }
+            </div>
+          `).join("")}
+        </div>
+      `;
+    } catch (error) {
+      console.error("audio", error);
+
+      document.getElementById("audio").innerHTML = `
+        <div class="empty">
+          аудио недоступно через текущие разрешения VK
+        </div>
+      `;
+    }
+  }
+
+  async function loadDocs(userId) {
+    try {
+      const result = await api("docs.get", {
+        owner_id: userId,
+        count: 100
+      });
+
+      currentData.docs = result.items || [];
+
+      if (!currentData.docs.length) {
+        document.getElementById("docs").innerHTML =
+          `<div class="empty">публичные документы не найдены</div>`;
+        return;
+      }
+
+      document.getElementById("docs").innerHTML = `
+        <div class="grid">
+          ${currentData.docs.map(doc => `
+            <div class="card">
+              <div class="card-title">
+                ${escapeHtml(doc.title || "без названия")}
+              </div>
+
+              ${field("тип", doc.ext)}
+              ${field("размер", doc.size)}
+            </div>
+          `).join("")}
+        </div>
+      `;
+    } catch (error) {
+      console.error("docs", error);
+
+      document.getElementById("docs").innerHTML = `
+        <div class="empty">
+          документы недоступны через текущие разрешения VK
+        </div>
+      `;
+    }
+  }
+
+  async function loadFriends(userId) {
+    try {
+      const result = await api("friends.get", {
+        user_id: userId,
+        order: "name",
+        count: 1000,
+        fields: "photo_100,screen_name,city"
+      });
+
+      currentData.friends = result.items || [];
+
+      renderPeople(
+        "connections",
+        "друзья",
+        currentData.friends
+      );
+    } catch (error) {
+      console.error("friends", error);
+
+      document.getElementById("connections").innerHTML = `
+        <div class="empty">
+          список друзей недоступен
+        </div>
+      `;
+    }
+  }
+
+  async function loadFollowers(userId) {
+    try {
+      const result = await api("users.getFollowers", {
+        user_id: userId,
+        count: 1000,
+        fields: "photo_100,screen_name"
+      });
+
+      currentData.followers = result.items || [];
+
+      renderPeople(
+        "connections",
+        "подписчики",
+        currentData.followers,
+        true
+      );
+    } catch (error) {
+      console.error("followers", error);
+    }
+  }
+
+  async function loadSubscriptions(userId) {
+    try {
+      const result = await api("users.getSubscriptions", {
+        user_id: userId,
+        extended: 1,
+        count: 200
+      });
+
+      currentData.subscriptions =
+        result.items || result.groups || [];
+
+      renderSubscriptions();
+    } catch (error) {
+      console.error("subscriptions", error);
+    }
+  }
+
+  function renderPeople(containerId, title, people, append = false) {
+    const container = document.getElementById(containerId);
+
+    const html = `
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-title">
+          ${escapeHtml(title)}
+          <span class="small">(${people.length})</span>
+        </div>
+
+        ${
+          people.length
+            ? people.slice(0, 300).map(person => `
+              <div class="person">
+                <img
+                  src="${escapeHtml(person.photo_100 || person.photo_50 || "")}"
+                  alt=""
+                  loading="lazy"
+                >
+
+                <div>
+                  <div class="person-name">
+                    ${escapeHtml(
+                      `${person.first_name || ""} ${person.last_name || ""}`.trim()
+                    )}
+                  </div>
+
+                  <div class="person-link">
+                    ${
+                      person.screen_name
+                        ? "@" + escapeHtml(person.screen_name)
+                        : "id" + escapeHtml(person.id)
+                    }
+                  </div>
                 </div>
               </div>
             `).join("")
-          : '<div class="empty">история пуста</div>'
-      }
-    </div>
-  `
-}
+            : `<div class="small">нет данных</div>`
+        }
+      </div>
+    `;
 
-async function analyze(){
-  const input = $("profileInput").value.trim()
-
-  if(!input){
-    setStatus("введи профиль VK")
-    return
+    if (append) {
+      container.innerHTML += html;
+    } else {
+      container.innerHTML = html;
+    }
   }
 
-  $("analyzeBtn").disabled = true
+  function renderSubscriptions() {
+    const container = document.getElementById("connections");
 
-  try{
-    setProgress(3)
-    setStatus("получаю профиль...")
-
-    currentData = {
-      profile:null,
-      wallPosts:[],
-      comments:[],
-      photos:[],
-      videos:[],
-      audio:[],
-      docs:[],
-      friends:[],
-      followers:[],
-      subscriptions:[],
-      groups:[],
-      links:[],
-      mentions:[],
-      hashtags:[],
-      external:[],
-      timeline:[]
+    if (!currentData.subscriptions.length) {
+      return;
     }
 
-    const user = await resolveUser(input)
-
-    currentData.profile = user
-
-    renderProfile()
-
-    setProgress(12)
-    setStatus("получаю посты...")
-
-    currentData.wallPosts =
-      await loadWall(user.id)
-
-    setProgress(28)
-    setStatus("анализирую комментарии...")
-
-    currentData.comments =
-      await loadComments(
-        user.id,
-        currentData.wallPosts
-      )
-
-    setProgress(38)
-    setStatus("получаю фотографии...")
-
-    currentData.photos =
-      await loadPhotos(user.id)
-
-    setProgress(48)
-    setStatus("получаю видео...")
-
-    currentData.videos =
-      await loadVideos(user.id)
-
-    setProgress(56)
-    setStatus("получаю аудио...")
-
-    currentData.audio =
-      await loadAudio(user.id)
-
-    setProgress(63)
-    setStatus("получаю документы...")
-
-    currentData.docs =
-      await loadDocs(user.id)
-
-    setProgress(70)
-    setStatus("получаю друзей...")
-
-    currentData.friends =
-      await loadFriends(user.id)
-
-    setProgress(77)
-    setStatus("получаю подписчиков...")
-
-    currentData.followers =
-      await loadFollowers(user.id)
-
-    setProgress(83)
-    setStatus("получаю подписки...")
-
-    currentData.subscriptions =
-      await loadSubscriptions(user.id)
-
-    setProgress(88)
-    setStatus("получаю сообщества...")
-
-    currentData.groups =
-      await loadGroups(user.id)
-
-    setProgress(94)
-    setStatus("строю аналитику...")
-
-    analytics()
-
-    renderProfile()
-    renderAnalytics()
-    renderConnections()
-    renderGroups()
-    renderPosts()
-    renderPhotos()
-    renderVideos()
-    renderAudio()
-    renderDocs()
-    renderExternal()
-    renderLinks()
-    renderTimeline()
-
-    saveSnapshot()
-
-    setProgress(100)
-    setStatus(
-      "готово · собрано максимально много доступной открытой информации"
-    )
-
-  }catch(error){
-    console.error(error)
-
-    $("profileContent").innerHTML = `
+    container.innerHTML += `
       <div class="card">
-        <div class="error">
-          ${esc(error.message || "произошла ошибка")}
+        <div class="card-title">
+          подписки
+          <span class="small">(${currentData.subscriptions.length})</span>
+        </div>
+
+        ${currentData.subscriptions.slice(0, 300).map(item => `
+          <div class="group">
+            <div class="group-name">
+              ${escapeHtml(item.name || item.first_name || "без названия")}
+            </div>
+
+            ${
+              item.screen_name
+                ? `
+                  <div class="group-link">
+                    @${escapeHtml(item.screen_name)}
+                  </div>
+                `
+                : ""
+            }
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  async function loadGroups(userId) {
+    try {
+      const result = await api("groups.get", {
+        user_id: userId,
+        extended: 1,
+        count: 1000,
+        fields: "description,activity,site"
+      });
+
+      currentData.groups = result.items || [];
+
+      renderGroups();
+    } catch (error) {
+      console.error("groups", error);
+
+      document.getElementById("communities").innerHTML = `
+        <div class="empty">
+          VK не разрешил получить список сообществ этого пользователя
+        </div>
+      `;
+    }
+  }
+
+  function renderGroups() {
+    if (!currentData.groups.length) {
+      document.getElementById("communities").innerHTML = `
+        <div class="empty">
+          публичные сообщества не найдены или VK ограничил доступ
+        </div>
+      `;
+      return;
+    }
+
+    document.getElementById("communities").innerHTML = `
+      <div class="card">
+        <div class="card-title">
+          сообщества
+          <span class="small">(${currentData.groups.length})</span>
+        </div>
+
+        ${currentData.groups.map(group => `
+          <div class="group">
+            <div class="group-name">
+              ${escapeHtml(group.name || "без названия")}
+            </div>
+
+            ${
+              group.screen_name
+                ? `
+                  <a
+                    class="group-link"
+                    href="https://vk.ru/${escapeHtml(group.screen_name)}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    vk.ru/${escapeHtml(group.screen_name)}
+                  </a>
+                `
+                : ""
+            }
+
+            ${
+              group.description
+                ? `
+                  <div class="small" style="margin-top:4px">
+                    ${escapeHtml(group.description)}
+                  </div>
+                `
+                : ""
+            }
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function extractLinksFromText(text) {
+    if (!text) return [];
+
+    const matches = text.match(
+      /https?:\/\/[^\s<>"']+/gi
+    );
+
+    return matches || [];
+  }
+
+  function extractLinksAndMentions() {
+    const links = [];
+    const mentions = [];
+
+    for (const post of currentData.wallPosts) {
+      const postLinks = extractLinksFromText(post.text || "");
+
+      for (const link of postLinks) {
+        if (!links.includes(link)) {
+          links.push(link);
+        }
+      }
+
+      const mentionMatches =
+        (post.text || "").match(/@[a-zA-Z0-9_.-]+/g) || [];
+
+      for (const mention of mentionMatches) {
+        if (!mentions.includes(mention)) {
+          mentions.push(mention);
+        }
+      }
+    }
+
+    currentData.links = links;
+    currentData.mentions = mentions;
+
+    renderLinksAndMentions();
+  }
+
+  function renderLinksAndMentions() {
+    document.getElementById("mentions").innerHTML = `
+      <div class="grid">
+
+        <div class="card">
+          <div class="card-title">
+            ссылки из публичных постов
+          </div>
+
+          ${
+            currentData.links.length
+              ? currentData.links.map(link => `
+                <div class="field">
+                  <a
+                    class="post-link"
+                    href="${escapeHtml(link)}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    ${escapeHtml(link)}
+                  </a>
+                </div>
+              `).join("")
+              : `<div class="small">ссылок не найдено</div>`
+          }
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            упоминания
+          </div>
+
+          ${
+            currentData.mentions.length
+              ? currentData.mentions.map(item => `
+                <div class="field">
+                  ${escapeHtml(item)}
+                </div>
+              `).join("")
+              : `<div class="small">упоминаний не найдено</div>`
+          }
+        </div>
+
+      </div>
+    `;
+  }
+
+  function getProfileIdentifiers() {
+    const result = [];
+
+    if (!currentUser) return result;
+
+    const fullName =
+      `${currentUser.first_name || ""} ${currentUser.last_name || ""}`
+        .trim();
+
+    if (fullName) {
+      result.push({
+        type: "имя",
+        value: fullName
+      });
+    }
+
+    if (currentUser.screen_name) {
+      result.push({
+        type: "username",
+        value: currentUser.screen_name
+      });
+    }
+
+    if (currentUser.site) {
+      result.push({
+        type: "сайт",
+        value: currentUser.site
+      });
+    }
+
+    if (currentUser.id) {
+      result.push({
+        type: "VK ID",
+        value: `id${currentUser.id}`
+      });
+    }
+
+    return result;
+  }
+
+  function buildExternalSources() {
+    if (!currentUser) return [];
+
+    const fullName =
+      `${currentUser.first_name || ""} ${currentUser.last_name || ""}`
+        .trim();
+
+    const username =
+      currentUser.screen_name
+        ? currentUser.screen_name.replace(/^@/, "")
+        : "";
+
+    const sources = [];
+
+    function addSource(
+      title,
+      description,
+      query,
+      urls,
+      type = "possible"
+    ) {
+      sources.push({
+        title,
+        description,
+        query,
+        urls,
+        type
+      });
+    }
+
+    if (fullName) {
+      addSource(
+        "общий веб-поиск",
+        "поиск публичных страниц с таким именем",
+        `"${fullName}"`,
+        [
+          {
+            name: "Google",
+            url: `https://www.google.com/search?q=${encodeURIComponent(`"${fullName}"`)}`
+          },
+          {
+            name: "Bing",
+            url: `https://www.bing.com/search?q=${encodeURIComponent(`"${fullName}"`)}`
+          },
+          {
+            name: "Yandex",
+            url: `https://yandex.ru/search/?text=${encodeURIComponent(`"${fullName}"`)}`
+          }
+        ]
+      );
+    }
+
+    if (username) {
+      addSource(
+        "поиск username",
+        "поиск публичных страниц с таким же username",
+        `"${username}"`,
+        [
+          {
+            name: "Google",
+            url: `https://www.google.com/search?q=${encodeURIComponent(`"${username}"`)}`
+          },
+          {
+            name: "Bing",
+            url: `https://www.bing.com/search?q=${encodeURIComponent(`"${username}"`)}`
+          },
+          {
+            name: "Yandex",
+            url: `https://yandex.ru/search/?text=${encodeURIComponent(`"${username}"`)}`
+          }
+        ]
+      );
+    }
+
+    if (username) {
+      const platforms = [
+        ["GitHub", "github.com"],
+        ["Reddit", "reddit.com"],
+        ["Telegram", "t.me"],
+        ["YouTube", "youtube.com"],
+        ["Twitch", "twitch.tv"],
+        ["Steam", "steamcommunity.com"],
+        ["X", "x.com"],
+        ["Instagram", "instagram.com"],
+        ["TikTok", "tiktok.com"],
+        ["Facebook", "facebook.com"],
+        ["LinkedIn", "linkedin.com"],
+        ["Pinterest", "pinterest.com"],
+        ["Behance", "behance.net"],
+        ["Dribbble", "dribbble.com"],
+        ["SoundCloud", "soundcloud.com"]
+      ];
+
+      for (const [name, domain] of platforms) {
+        const query = `site:${domain} "${username}"`;
+
+        addSource(
+          name,
+          `поиск публичных страниц ${name} с username "${username}"`,
+          query,
+          [
+            {
+              name: `искать в ${name}`,
+              url: `https://www.google.com/search?q=${encodeURIComponent(query)}`
+            }
+          ]
+        );
+      }
+    }
+
+    if (fullName) {
+      const namedPlatforms = [
+        ["GitHub", "github.com"],
+        ["Reddit", "reddit.com"],
+        ["YouTube", "youtube.com"],
+        ["Twitch", "twitch.tv"],
+        ["LinkedIn", "linkedin.com"],
+        ["Behance", "behance.net"],
+        ["Dribbble", "dribbble.com"]
+      ];
+
+      for (const [name, domain] of namedPlatforms) {
+        const query = `site:${domain} "${fullName}"`;
+
+        addSource(
+          `${name} · имя`,
+          `поиск публичных страниц ${name} по имени`,
+          query,
+          [
+            {
+              name: "искать",
+              url: `https://www.google.com/search?q=${encodeURIComponent(query)}`
+            }
+          ]
+        );
+      }
+    }
+
+    if (currentUser.site) {
+      addSource(
+        "сайт из VK",
+        "сайт указан непосредственно в публичном профиле VK",
+        currentUser.site,
+        [
+          {
+            name: "открыть сайт",
+            url: normalizeExternalUrl(currentUser.site)
+          }
+        ],
+        "profile"
+      );
+    }
+
+    for (const link of currentData.links.slice(0, 20)) {
+      addSource(
+        "ссылка из поста",
+        "ссылка обнаружена в публичном посте VK",
+        link,
+        [
+          {
+            name: "открыть",
+            url: link
+          }
+        ],
+        "profile"
+      );
+    }
+
+    return sources;
+  }
+
+  function normalizeExternalUrl(value) {
+    if (/^https?:\/\//i.test(value)) {
+      return value;
+    }
+
+    return "https://" + value;
+  }
+
+  function renderExternalSources() {
+    const sources = buildExternalSources();
+
+    if (!sources.length) {
+      document.getElementById("external").innerHTML = `
+        <div class="empty">
+          недостаточно публичных идентификаторов для внешнего поиска
+        </div>
+      `;
+      return;
+    }
+
+    const possibleCount =
+      sources.filter(x => x.type === "possible").length;
+
+    const profileCount =
+      sources.filter(x => x.type === "profile").length;
+
+    document.getElementById("external").innerHTML = `
+      <div class="warning">
+        этот раздел открывает поиск по публичному интернету
+        <br><br>
+        совпадение username или имени само по себе не доказывает,
+        что найденная страница принадлежит тому же человеку
+      </div>
+
+      <div class="grid" style="margin-bottom:12px">
+        <div class="card">
+          <div class="small">поисковых источников</div>
+          <div class="count">${sources.length}</div>
+        </div>
+
+        <div class="card">
+          <div class="small">возможных совпадений</div>
+          <div class="count">${possibleCount}</div>
+        </div>
+
+        <div class="card">
+          <div class="small">ссылок непосредственно из VK</div>
+          <div class="count">${profileCount}</div>
         </div>
       </div>
-    `
 
-    setStatus("анализ завершился с ошибкой")
-  }finally{
-    $("analyzeBtn").disabled = false
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-title">идентификаторы поиска</div>
+
+        ${getProfileIdentifiers().map(item => `
+          <div class="field">
+            <div class="field-label">${escapeHtml(item.type)}</div>
+            <div class="field-value">${escapeHtml(item.value)}</div>
+          </div>
+        `).join("")}
+      </div>
+
+      ${sources.map(source => `
+        <div class="source ${source.type === "profile" ? "profile" : "possible"}">
+
+          <div class="source-title">
+            ${escapeHtml(source.title)}
+          </div>
+
+          <div class="source-desc">
+            ${escapeHtml(source.description)}
+          </div>
+
+          <div class="source-query">
+            ${escapeHtml(source.query)}
+          </div>
+
+          <div class="source-actions">
+            ${source.urls.map(url => `
+              <a
+                class="source-btn ${source.type === "profile" ? "" : "secondary"}"
+                href="${escapeHtml(url.url)}"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                ${escapeHtml(url.name)}
+              </a>
+            `).join("")}
+          </div>
+
+        </div>
+      `).join("")}
+    `;
   }
-}
 
-document.querySelectorAll(".tab").forEach(button=>{
-  button.addEventListener("click",()=>{
-    document
-      .querySelectorAll(".tab")
-      .forEach(x=>x.classList.remove("active"))
+  function renderTimeline() {
+    const items = [];
 
-    document
-      .querySelectorAll(".panel")
-      .forEach(x=>x.classList.remove("active"))
-
-    button.classList.add("active")
-
-    const panel = $("panel-" + button.dataset.tab)
-
-    if(panel){
-      panel.classList.add("active")
+    if (currentUser) {
+      items.push({
+        date: currentUser.last_seen?.time
+          ? formatDate(currentUser.last_seen.time)
+          : "неизвестно",
+        text: "последний публично доступный online timestamp профиля"
+      });
     }
-  })
-})
 
-$("analyzeBtn").addEventListener(
-  "click",
-  analyze
-)
+    for (const post of currentData.wallPosts) {
+      items.push({
+        date: formatDate(post.date),
+        text:
+          post.text
+            ? post.text.slice(0, 300)
+            : "публичный пост без текста"
+      });
+    }
 
-$("profileInput").addEventListener(
-  "keydown",
-  e=>{
-    if(e.key==="Enter"){
-      analyze()
+    items.sort((a, b) => {
+      return String(b.date).localeCompare(String(a.date));
+    });
+
+    document.getElementById("timeline").innerHTML = `
+      <div class="card">
+        <div class="card-title">публичный таймлайн</div>
+
+        ${
+          items.length
+            ? items.slice(0, 200).map(item => `
+              <div class="timeline-item">
+                <div class="timeline-date">
+                  ${escapeHtml(item.date)}
+                </div>
+
+                <div class="timeline-content">
+                  ${escapeHtml(item.text)}
+                </div>
+              </div>
+            `).join("")
+            : `<div class="small">данных пока нет</div>`
+        }
+      </div>
+    `;
+  }
+
+  function saveSnapshot() {
+    if (!currentUser) return;
+
+    const key = "vk_profile_analyzer_history";
+
+    let history = [];
+
+    try {
+      history = JSON.parse(
+        localStorage.getItem(key) || "[]"
+      );
+    } catch {
+      history = [];
+    }
+
+    const snapshot = {
+      id: currentUser.id,
+      name:
+        `${currentUser.first_name || ""} ${currentUser.last_name || ""}`
+          .trim(),
+      screen_name: currentUser.screen_name || null,
+      followers_count: currentUser.followers_count || 0,
+      status: currentUser.status || "",
+      saved_at: new Date().toISOString()
+    };
+
+    history.unshift(snapshot);
+
+    history = history
+      .filter((item, index, arr) => {
+        return index === arr.findIndex(x =>
+          x.id === item.id &&
+          x.saved_at.slice(0, 10) === item.saved_at.slice(0, 10)
+        );
+      })
+      .slice(0, 100);
+
+    localStorage.setItem(
+      key,
+      JSON.stringify(history)
+    );
+
+    renderHistory();
+  }
+
+  function renderHistory() {
+    let history = [];
+
+    try {
+      history = JSON.parse(
+        localStorage.getItem("vk_profile_analyzer_history") || "[]"
+      );
+    } catch {
+      history = [];
+    }
+
+    if (!history.length) {
+      document.getElementById("history").innerHTML = `
+        <div class="empty">
+          сохраненных снимков пока нет
+        </div>
+      `;
+      return;
+    }
+
+    document.getElementById("history").innerHTML = `
+      <div class="card">
+        <div class="card-title">локальная история анализов</div>
+
+        <div class="warning">
+          история хранится только в браузере этого устройства
+        </div>
+
+        ${history.map(item => `
+          <div class="history-item">
+
+            <div>
+              <strong>
+                ${escapeHtml(item.name || "без имени")}
+              </strong>
+
+              ${
+                item.screen_name
+                  ? `
+                    <span class="small">
+                      · @${escapeHtml(item.screen_name)}
+                    </span>
+                  `
+                  : ""
+              }
+            </div>
+
+            <div class="small">
+              VK ID: ${escapeHtml(item.id)}
+            </div>
+
+            <div class="small">
+              подписчики:
+              ${escapeHtml(item.followers_count)}
+            </div>
+
+            <div class="small">
+              снимок:
+              ${escapeHtml(
+                new Date(item.saved_at).toLocaleString("ru-RU")
+              )}
+            </div>
+
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function resetSections() {
+    document.getElementById("connections").innerHTML = "";
+    document.getElementById("communities").innerHTML = "";
+    document.getElementById("wall").innerHTML = "";
+    document.getElementById("photos").innerHTML = "";
+    document.getElementById("videos").innerHTML = "";
+    document.getElementById("audio").innerHTML = "";
+    document.getElementById("docs").innerHTML = "";
+    document.getElementById("external").innerHTML = "";
+    document.getElementById("mentions").innerHTML = "";
+    document.getElementById("timeline").innerHTML = "";
+  }
+
+  async function analyzeProfile() {
+    const input =
+      document.getElementById("profileInput").value.trim();
+
+    if (!input) {
+      setStatus("введи ссылку на VK или ID", true);
+      return;
+    }
+
+    const button = document.getElementById("analyzeBtn");
+
+    button.disabled = true;
+    button.textContent = "анализ...";
+
+    resetSections();
+
+    currentData = {
+      profile: null,
+      wallPosts: [],
+      photos: [],
+      videos: [],
+      audio: [],
+      docs: [],
+      friends: [],
+      followers: [],
+      subscriptions: [],
+      groups: [],
+      links: [],
+      mentions: []
+    };
+
+    try {
+      setStatus("получаю профиль VK...");
+
+      const user = await resolveUser(input);
+
+      currentData.profile = user;
+
+      renderProfile(user);
+
+      setStatus(
+        `профиль найден: ${user.first_name || ""} ${user.last_name || ""}`
+      );
+
+      /*
+       * Сначала получаем наиболее важные публичные данные
+       * параллельно, чтобы интерфейс не ждал каждый запрос отдельно
+       */
+
+      const results = await Promise.allSettled([
+        loadWall(user.id),
+        loadPhotos(user.id),
+        loadVideos(user.id),
+        loadAudio(user.id),
+        loadDocs(user.id),
+        loadFriends(user.id),
+        loadFollowers(user.id),
+        loadSubscriptions(user.id),
+        loadGroups(user.id)
+      ]);
+
+      console.log("VK analysis results", results);
+
+      extractLinksAndMentions();
+      renderExternalSources();
+      renderTimeline();
+      saveSnapshot();
+
+      setStatus("анализ завершен");
+    } catch (error) {
+      console.error(error);
+
+      setStatus(
+        error.message || "ошибка анализа профиля",
+        true
+      );
+    } finally {
+      button.disabled = false;
+      button.textContent = "Анализировать";
     }
   }
-)
 
-renderHistory()
-initVK()
+  function setupTabs() {
+    document.querySelectorAll(".tab").forEach(button => {
+      button.addEventListener("click", () => {
+        const target = button.dataset.tab;
+
+        document.querySelectorAll(".tab").forEach(tab => {
+          tab.classList.toggle(
+            "active",
+            tab === button
+          );
+        });
+
+        document.querySelectorAll(".section").forEach(section => {
+          section.classList.remove("active");
+        });
+
+        const section =
+          document.getElementById(`section-${target}`);
+
+        if (section) {
+          section.classList.add("active");
+        }
+      });
+    });
+  }
+
+  document
+    .getElementById("analyzeBtn")
+    .addEventListener("click", analyzeProfile);
+
+  document
+    .getElementById("profileInput")
+    .addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        analyzeProfile();
+      }
+    });
+
+  setupTabs();
+  renderHistory();
+  initVK();
 </script>
 
 </body>
