@@ -2,30 +2,410 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0,
     shrink-to-fit=no, user-scalable=no, viewport-fit=cover"
   >
-  <title>VK Test</title>
-</head>
 
-<body>
-  <h1>VK APP TEST</h1>
-  <p id="status">загрузка VK Bridge...</p>
+  <title>VK Profile Analyzer</title>
 
   <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f2f3f5;
+      color: #111;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      color: #777;
+      margin-bottom: 24px;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      font-size: 16px;
+      margin-bottom: 12px;
+      background: white;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      border: 0;
+      border-radius: 12px;
+      background: #447bba;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+    }
+
+    #status {
+      margin-top: 16px;
+      color: #666;
+    }
+
+    .profile {
+      display: none;
+      margin-top: 24px;
+      padding: 20px;
+      background: white;
+      border-radius: 16px;
+    }
+
+    .avatar {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      margin-bottom: 15px;
+    }
+
+    .name {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .info {
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .error {
+      color: #d33 !important;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>VK Profile Analyzer</h1>
+
+    <div class="subtitle">
+      анализ публичной информации профиля VK
+    </div>
+
+    <input
+      id="profileUrl"
+      type="text"
+      placeholder="вставь ссылку на профиль VK"
+    >
+
+    <button id="analyzeButton">
+      анализировать профиль
+    </button>
+
+    <div id="status">
+      подключение к VK...
+    </div>
+
+    <div id="profile" class="profile">
+
+      <img id="avatar" class="avatar" src="" alt="">
+
+      <div id="name" class="name"></div>
+
+      <div id="info" class="info"></div>
+
+    </div>
+
+  </div>
+
   <script>
-    vkBridge.send('VKWebAppInit')
-      .then(() => {
-        document.getElementById('status').textContent =
-          'VK Bridge работает'
-      })
-      .catch((error) => {
-        document.getElementById('status').textContent =
-          'ошибка VK Bridge: ' + JSON.stringify(error)
-      })
+
+    let vkReady = false
+
+    function setStatus(text, error = false) {
+      const status = document.getElementById("status")
+      status.textContent = text
+      status.className = error ? "error" : ""
+    }
+
+    function getScreenName(url) {
+
+      url = url.trim()
+
+      try {
+
+        const parsed = new URL(url)
+
+        let path = parsed.pathname
+          .replace(/^\/+/, "")
+          .replace(/\/+$/, "")
+
+        if (!path) {
+          return null
+        }
+
+        return path
+
+      } catch {
+
+        return url
+          .replace(/^https?:\/\/(www\.)?vk\.com\//, "")
+          .replace(/^https?:\/\/(www\.)?vk\.ru\//, "")
+          .replace(/^\/+/, "")
+          .split("?")[0]
+          .split("#")[0]
+
+      }
+    }
+
+    async function initVK() {
+
+      try {
+
+        await vkBridge.send("VKWebAppInit")
+
+        vkReady = true
+
+        setStatus("VK Bridge работает")
+
+      } catch (error) {
+
+        console.error(error)
+
+        setStatus(
+          "не удалось подключиться к VK",
+          true
+        )
+
+      }
+
+    }
+
+    async function analyzeProfile() {
+
+      if (!vkReady) {
+
+        setStatus(
+          "VK еще не готов, попробуй через секунду",
+          true
+        )
+
+        return
+
+      }
+
+      const input = document.getElementById("profileUrl")
+      const button = document.getElementById("analyzeButton")
+
+      const screenName = getScreenName(input.value)
+
+      if (!screenName) {
+
+        setStatus(
+          "вставь ссылку на профиль VK",
+          true
+        )
+
+        return
+
+      }
+
+      button.disabled = true
+
+      setStatus("получаю информацию о профиле...")
+
+      document.getElementById("profile").style.display = "none"
+
+      try {
+
+        const response = await vkBridge.send(
+          "VKWebAppCallAPIMethod",
+          {
+            method: "users.get",
+            params: {
+              user_ids: screenName,
+              fields: [
+                "photo_200",
+                "city",
+                "country",
+                "bdate",
+                "sex",
+                "status",
+                "about",
+                "activities",
+                "interests",
+                "books",
+                "movies",
+                "music",
+                "games",
+                "site",
+                "followers_count",
+                "verified",
+                "last_seen",
+                "occupation",
+                "relation",
+                "contacts"
+              ].join(","),
+              v: "5.199"
+            }
+          }
+        )
+
+        if (
+          !response ||
+          !response.response ||
+          !response.response.length
+        ) {
+
+          throw new Error(
+            "профиль не найден"
+          )
+
+        }
+
+        const user = response.response[0]
+
+        document.getElementById("avatar").src =
+          user.photo_200 || ""
+
+        document.getElementById("name").textContent =
+          `${user.first_name || ""} ${user.last_name || ""}`.trim()
+
+        let information = []
+
+        if (user.id) {
+          information.push(`VK ID: ${user.id}`)
+        }
+
+        if (user.screen_name) {
+          information.push(`адрес: vk.com/${user.screen_name}`)
+        }
+
+        if (user.city?.title) {
+          information.push(`город: ${user.city.title}`)
+        }
+
+        if (user.country?.title) {
+          information.push(`страна: ${user.country.title}`)
+        }
+
+        if (user.bdate) {
+          information.push(`дата рождения: ${user.bdate}`)
+        }
+
+        if (user.status) {
+          information.push(`статус: ${user.status}`)
+        }
+
+        if (user.followers_count != null) {
+          information.push(
+            `подписчики: ${user.followers_count}`
+          )
+        }
+
+        if (user.occupation?.name) {
+          information.push(
+            `место работы: ${user.occupation.name}`
+          )
+        }
+
+        if (user.interests) {
+          information.push(
+            `интересы: ${user.interests}`
+          )
+        }
+
+        if (user.activities) {
+          information.push(
+            `деятельность: ${user.activities}`
+          )
+        }
+
+        if (user.music) {
+          information.push(
+            `музыка: ${user.music}`
+          )
+        }
+
+        if (user.movies) {
+          information.push(
+            `фильмы: ${user.movies}`
+          )
+        }
+
+        if (user.books) {
+          information.push(
+            `книги: ${user.books}`
+          )
+        }
+
+        if (user.games) {
+          information.push(
+            `игры: ${user.games}`
+          )
+        }
+
+        document.getElementById("info").innerHTML =
+          information
+            .map(item => `<div>${item}</div>`)
+            .join("")
+
+        document.getElementById("profile").style.display =
+          "block"
+
+        setStatus("профиль найден")
+
+      } catch (error) {
+
+        console.error(error)
+
+        setStatus(
+          "не удалось получить профиль: " +
+          (error.message || "неизвестная ошибка"),
+          true
+        )
+
+      } finally {
+
+        button.disabled = false
+
+      }
+
+    }
+
+    document
+      .getElementById("analyzeButton")
+      .addEventListener(
+        "click",
+        analyzeProfile
+      )
+
+    initVK()
+
   </script>
+
 </body>
 </html>
