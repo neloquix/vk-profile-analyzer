@@ -32,8 +32,8 @@
     }
 
     h1 {
-      margin-bottom: 8px;
       font-size: 28px;
+      margin-bottom: 8px;
     }
 
     .subtitle {
@@ -69,6 +69,11 @@
     #status {
       margin-top: 16px;
       color: #666;
+      word-break: break-word;
+    }
+
+    .error {
+      color: #d33 !important;
     }
 
     .profile {
@@ -84,328 +89,363 @@
       height: 96px;
       border-radius: 50%;
       object-fit: cover;
-      display: block;
       margin-bottom: 15px;
     }
 
     .name {
       font-size: 24px;
       font-weight: 700;
-      margin-bottom: 6px;
+      margin-bottom: 10px;
     }
 
     .info {
-      color: #666;
-      line-height: 1.6;
-    }
-
-    .error {
-      color: #d33 !important;
+      color: #555;
+      line-height: 1.7;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <h1>VK Profile Analyzer</h1>
+  <h1>VK Profile Analyzer</h1>
 
-    <div class="subtitle">
-      анализ публичной информации профиля VK
-    </div>
+  <div class="subtitle">
+    анализ публичной информации профиля VK
+  </div>
 
-    <input
-      id="profileUrl"
-      type="text"
-      placeholder="вставь ссылку на профиль VK"
-    >
+  <input
+    id="profileUrl"
+    type="text"
+    placeholder="вставь ссылку на профиль VK"
+    value="https://vk.ru/id802548516"
+  >
 
-    <button id="analyzeButton">
-      анализировать профиль
-    </button>
+  <button id="analyzeButton">
+    анализировать профиль
+  </button>
 
-    <div id="status">
-      подключение к VK...
-    </div>
+  <div id="status">
+    подключение к VK...
+  </div>
 
-    <div id="profile" class="profile">
+  <div id="profile" class="profile">
 
-      <img id="avatar" class="avatar" src="" alt="">
+    <img id="avatar" class="avatar" src="" alt="">
 
-      <div id="name" class="name"></div>
+    <div id="name" class="name"></div>
 
-      <div id="info" class="info"></div>
-
-    </div>
+    <div id="info" class="info"></div>
 
   </div>
 
-  <script>
+</div>
 
-    let vkReady = false
+<script>
 
-    function setStatus(text, error = false) {
-      const status = document.getElementById("status")
-      status.textContent = text
-      status.className = error ? "error" : ""
+const APP_ID = 54790628
+const API_VERSION = "5.199"
+
+let accessToken = null
+let vkReady = false
+
+function setStatus(text, error = false) {
+  const status = document.getElementById("status")
+
+  status.textContent = text
+  status.className = error ? "error" : ""
+}
+
+function getUserId(value) {
+
+  value = value.trim()
+
+  const match = value.match(
+    /(?:vk\.com|vk\.ru)\/id(\d+)/i
+  )
+
+  if (match) {
+    return match[1]
+  }
+
+  const directId = value.match(/^\d+$/)
+
+  if (directId) {
+    return directId[0]
+  }
+
+  return value
+}
+
+async function initVK() {
+
+  try {
+
+    await vkBridge.send("VKWebAppInit")
+
+    vkReady = true
+
+    setStatus("VK Bridge работает")
+
+  } catch (error) {
+
+    console.error(error)
+
+    setStatus(
+      "ошибка запуска VK: " +
+      JSON.stringify(error),
+      true
+    )
+
+  }
+}
+
+async function getToken() {
+
+  if (accessToken) {
+    return accessToken
+  }
+
+  setStatus("запрашиваю доступ к VK API...")
+
+  try {
+
+    const result = await vkBridge.send(
+      "VKWebAppGetAuthToken",
+      {
+        app_id: APP_ID,
+        scope: ""
+      }
+    )
+
+    accessToken = result.access_token
+
+    if (!accessToken) {
+      throw new Error("VK не вернул access token")
     }
 
-    function getScreenName(url) {
+    return accessToken
 
-      url = url.trim()
+  } catch (error) {
 
-      try {
+    console.error("AUTH ERROR:", error)
 
-        const parsed = new URL(url)
+    throw new Error(
+      "ошибка авторизации: " +
+      JSON.stringify(error)
+    )
 
-        let path = parsed.pathname
-          .replace(/^\/+/, "")
-          .replace(/\/+$/, "")
+  }
+}
 
-        if (!path) {
-          return null
-        }
+async function analyzeProfile() {
 
-        return path
+  const button =
+    document.getElementById("analyzeButton")
 
-      } catch {
+  button.disabled = true
 
-        return url
-          .replace(/^https?:\/\/(www\.)?vk\.com\//, "")
-          .replace(/^https?:\/\/(www\.)?vk\.ru\//, "")
-          .replace(/^\/+/, "")
-          .split("?")[0]
-          .split("#")[0]
+  document.getElementById("profile").style.display =
+    "none"
 
-      }
+  try {
+
+    if (!vkReady) {
+      throw new Error("VK Bridge еще не готов")
     }
 
-    async function initVK() {
-
-      try {
-
-        await vkBridge.send("VKWebAppInit")
-
-        vkReady = true
-
-        setStatus("VK Bridge работает")
-
-      } catch (error) {
-
-        console.error(error)
-
-        setStatus(
-          "не удалось подключиться к VK",
-          true
-        )
-
-      }
-
-    }
-
-    async function analyzeProfile() {
-
-      if (!vkReady) {
-
-        setStatus(
-          "VK еще не готов, попробуй через секунду",
-          true
-        )
-
-        return
-
-      }
-
-      const input = document.getElementById("profileUrl")
-      const button = document.getElementById("analyzeButton")
-
-      const screenName = getScreenName(input.value)
-
-      if (!screenName) {
-
-        setStatus(
-          "вставь ссылку на профиль VK",
-          true
-        )
-
-        return
-
-      }
-
-      button.disabled = true
-
-      setStatus("получаю информацию о профиле...")
-
-      document.getElementById("profile").style.display = "none"
-
-      try {
-
-        const response = await vkBridge.send(
-          "VKWebAppCallAPIMethod",
-          {
-            method: "users.get",
-            params: {
-              user_ids: screenName,
-              fields: [
-                "photo_200",
-                "city",
-                "country",
-                "bdate",
-                "sex",
-                "status",
-                "about",
-                "activities",
-                "interests",
-                "books",
-                "movies",
-                "music",
-                "games",
-                "site",
-                "followers_count",
-                "verified",
-                "last_seen",
-                "occupation",
-                "relation",
-                "contacts"
-              ].join(","),
-              v: "5.199"
-            }
-          }
-        )
-
-        if (
-          !response ||
-          !response.response ||
-          !response.response.length
-        ) {
-
-          throw new Error(
-            "профиль не найден"
-          )
-
-        }
-
-        const user = response.response[0]
-
-        document.getElementById("avatar").src =
-          user.photo_200 || ""
-
-        document.getElementById("name").textContent =
-          `${user.first_name || ""} ${user.last_name || ""}`.trim()
-
-        let information = []
-
-        if (user.id) {
-          information.push(`VK ID: ${user.id}`)
-        }
-
-        if (user.screen_name) {
-          information.push(`адрес: vk.com/${user.screen_name}`)
-        }
-
-        if (user.city?.title) {
-          information.push(`город: ${user.city.title}`)
-        }
-
-        if (user.country?.title) {
-          information.push(`страна: ${user.country.title}`)
-        }
-
-        if (user.bdate) {
-          information.push(`дата рождения: ${user.bdate}`)
-        }
-
-        if (user.status) {
-          information.push(`статус: ${user.status}`)
-        }
-
-        if (user.followers_count != null) {
-          information.push(
-            `подписчики: ${user.followers_count}`
-          )
-        }
-
-        if (user.occupation?.name) {
-          information.push(
-            `место работы: ${user.occupation.name}`
-          )
-        }
-
-        if (user.interests) {
-          information.push(
-            `интересы: ${user.interests}`
-          )
-        }
-
-        if (user.activities) {
-          information.push(
-            `деятельность: ${user.activities}`
-          )
-        }
-
-        if (user.music) {
-          information.push(
-            `музыка: ${user.music}`
-          )
-        }
-
-        if (user.movies) {
-          information.push(
-            `фильмы: ${user.movies}`
-          )
-        }
-
-        if (user.books) {
-          information.push(
-            `книги: ${user.books}`
-          )
-        }
-
-        if (user.games) {
-          information.push(
-            `игры: ${user.games}`
-          )
-        }
-
-        document.getElementById("info").innerHTML =
-          information
-            .map(item => `<div>${item}</div>`)
-            .join("")
-
-        document.getElementById("profile").style.display =
-          "block"
-
-        setStatus("профиль найден")
-
-          } catch (error) {
-
-        console.error("VK ERROR:", error)
-
-        setStatus(
-          "ошибка VK: " +
-          JSON.stringify(error),
-          true
-        )
-
-    } finally {
-
-        button.disabled = false
-
-      }
-
-    }
-
-    document
-      .getElementById("analyzeButton")
-      .addEventListener(
-        "click",
-        analyzeProfile
+    const userId =
+      getUserId(
+        document.getElementById("profileUrl").value
       )
 
-    initVK()
+    if (!userId) {
+      throw new Error("не указана ссылка на профиль")
+    }
 
-  </script>
+    const token = await getToken()
+
+    setStatus("получаю информацию о профиле...")
+
+    const result = await vkBridge.send(
+      "VKWebAppCallAPIMethod",
+      {
+        method: "users.get",
+
+        params: {
+          user_ids: userId,
+
+          fields: [
+            "photo_200",
+            "city",
+            "country",
+            "bdate",
+            "sex",
+            "status",
+            "about",
+            "activities",
+            "interests",
+            "books",
+            "movies",
+            "music",
+            "games",
+            "site",
+            "followers_count",
+            "verified",
+            "last_seen",
+            "occupation",
+            "relation"
+          ].join(","),
+
+          access_token: token,
+
+          v: API_VERSION
+        }
+      }
+    )
+
+    console.log("VK RESPONSE:", result)
+
+    if (
+      !result ||
+      !result.response ||
+      !result.response.length
+    ) {
+
+      throw new Error(
+        "VK не вернул данные пользователя: " +
+        JSON.stringify(result)
+      )
+    }
+
+    const user = result.response[0]
+
+    document.getElementById("avatar").src =
+      user.photo_200 || ""
+
+    document.getElementById("name").textContent =
+      `${user.first_name || ""} ${user.last_name || ""}`.trim()
+
+    const information = []
+
+    information.push(`VK ID: ${user.id}`)
+
+    if (user.screen_name) {
+      information.push(
+        `адрес: vk.com/${user.screen_name}`
+      )
+    }
+
+    if (user.city?.title) {
+      information.push(
+        `город: ${user.city.title}`
+      )
+    }
+
+    if (user.country?.title) {
+      information.push(
+        `страна: ${user.country.title}`
+      )
+    }
+
+    if (user.bdate) {
+      information.push(
+        `дата рождения: ${user.bdate}`
+      )
+    }
+
+    if (user.status) {
+      information.push(
+        `статус: ${user.status}`
+      )
+    }
+
+    if (user.followers_count != null) {
+      information.push(
+        `подписчики: ${user.followers_count}`
+      )
+    }
+
+    if (user.interests) {
+      information.push(
+        `интересы: ${user.interests}`
+      )
+    }
+
+    if (user.activities) {
+      information.push(
+        `деятельность: ${user.activities}`
+      )
+    }
+
+    if (user.music) {
+      information.push(
+        `музыка: ${user.music}`
+      )
+    }
+
+    if (user.movies) {
+      information.push(
+        `фильмы: ${user.movies}`
+      )
+    }
+
+    if (user.books) {
+      information.push(
+        `книги: ${user.books}`
+      )
+    }
+
+    if (user.games) {
+      information.push(
+        `игры: ${user.games}`
+      )
+    }
+
+    if (user.occupation?.name) {
+      information.push(
+        `работа: ${user.occupation.name}`
+      )
+    }
+
+    document.getElementById("info").innerHTML =
+      information
+        .map(item => `<div>${item}</div>`)
+        .join("")
+
+    document.getElementById("profile").style.display =
+      "block"
+
+    setStatus("профиль найден")
+
+  } catch (error) {
+
+    console.error("PROFILE ERROR:", error)
+
+    setStatus(
+      error.message ||
+      JSON.stringify(error),
+      true
+    )
+
+  } finally {
+
+    button.disabled = false
+
+  }
+}
+
+document
+  .getElementById("analyzeButton")
+  .addEventListener(
+    "click",
+    analyzeProfile
+  )
+
+initVK()
+
+</script>
 
 </body>
 </html>
