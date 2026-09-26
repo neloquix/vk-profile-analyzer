@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
+
   <meta charset="UTF-8">
 
   <meta
@@ -14,6 +16,7 @@
   <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 
   <style>
+
     * {
       box-sizing: border-box;
     }
@@ -21,19 +24,25 @@
     body {
       margin: 0;
       padding: 20px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
       background: #f2f3f5;
       color: #111;
     }
 
     .container {
-      max-width: 600px;
+      max-width: 650px;
       margin: 0 auto;
     }
 
     h1 {
       font-size: 28px;
-      margin-bottom: 8px;
+      margin: 0 0 8px;
     }
 
     .subtitle {
@@ -43,21 +52,30 @@
 
     input {
       width: 100%;
+
       padding: 15px;
+
       border: 1px solid #ccc;
       border-radius: 12px;
+
       font-size: 16px;
+
       margin-bottom: 12px;
+
       background: white;
     }
 
     button {
       width: 100%;
+
       padding: 15px;
+
       border: 0;
       border-radius: 12px;
+
       background: #447bba;
       color: white;
+
       font-size: 16px;
       font-weight: 600;
     }
@@ -68,7 +86,9 @@
 
     #status {
       margin-top: 16px;
+
       color: #666;
+
       word-break: break-word;
     }
 
@@ -78,42 +98,163 @@
 
     .profile {
       display: none;
+
       margin-top: 24px;
+
       padding: 20px;
+
       background: white;
+
       border-radius: 16px;
     }
 
     .avatar {
       width: 96px;
       height: 96px;
+
       border-radius: 50%;
+
       object-fit: cover;
+
       margin-bottom: 15px;
     }
 
     .name {
       font-size: 24px;
+
       font-weight: 700;
+
       margin-bottom: 10px;
     }
 
     .info {
       color: #555;
+
       line-height: 1.7;
     }
+
+    .section {
+      display: none;
+
+      margin-top: 24px;
+    }
+
+    .section-title {
+      font-size: 22px;
+
+      font-weight: 700;
+
+      margin-bottom: 12px;
+    }
+
+    .post {
+      background: white;
+
+      border-radius: 16px;
+
+      padding: 18px;
+
+      margin-bottom: 14px;
+    }
+
+    .post-date {
+      color: #888;
+
+      font-size: 13px;
+
+      margin-bottom: 10px;
+    }
+
+    .post-text {
+      white-space: pre-wrap;
+
+      word-break: break-word;
+
+      line-height: 1.5;
+
+      margin-bottom: 14px;
+    }
+
+    .post-stats {
+      color: #777;
+
+      font-size: 14px;
+
+      margin-top: 12px;
+    }
+
+    .post-link {
+      display: block;
+
+      margin-top: 12px;
+
+      color: #447bba;
+
+      text-decoration: none;
+
+      word-break: break-all;
+    }
+
+    .attachment {
+      margin-top: 12px;
+
+      padding: 10px;
+
+      background: #f2f3f5;
+
+      border-radius: 10px;
+
+      font-size: 14px;
+    }
+
+    .attachment img {
+      width: 100%;
+
+      max-height: 500px;
+
+      object-fit: contain;
+
+      border-radius: 10px;
+
+      display: block;
+    }
+
+    .empty {
+      background: white;
+
+      border-radius: 16px;
+
+      padding: 18px;
+
+      color: #777;
+    }
+
+    .load-more {
+      margin-top: 4px;
+
+      margin-bottom: 30px;
+    }
+
   </style>
+
 </head>
+
 
 <body>
 
+
 <div class="container">
 
-  <h1>VK Profile Analyzer</h1>
+
+  <h1>
+    VK Profile Analyzer
+  </h1>
+
 
   <div class="subtitle">
     анализ публичной информации профиля VK
   </div>
+
 
   <input
     id="profileUrl"
@@ -122,75 +263,201 @@
     value="https://vk.ru/id802548516"
   >
 
+
   <button id="analyzeButton">
     анализировать профиль
   </button>
+
 
   <div id="status">
     подключение к VK...
   </div>
 
-  <div id="profile" class="profile">
 
-    <img id="avatar" class="avatar" src="" alt="">
+  <div
+    id="profile"
+    class="profile"
+  >
 
-    <div id="name" class="name"></div>
+    <img
+      id="avatar"
+      class="avatar"
+      src=""
+      alt=""
+    >
 
-    <div id="info" class="info"></div>
+
+    <div
+      id="name"
+      class="name"
+    ></div>
+
+
+    <div
+      id="info"
+      class="info"
+    ></div>
 
   </div>
 
+
+  <div
+    id="wallSection"
+    class="section"
+  >
+
+    <div class="section-title">
+      стена
+    </div>
+
+
+    <div id="wall"></div>
+
+
+    <button
+      id="loadMoreButton"
+      class="load-more"
+      style="display:none"
+    >
+      загрузить еще
+    </button>
+
+  </div>
+
+
 </div>
+
 
 <script>
 
+
+/* =========================
+   ОСНОВНЫЕ НАСТРОЙКИ
+========================= */
+
+
 const APP_ID = 54790628
+
 const API_VERSION = "5.199"
 
+
 let accessToken = null
+
 let vkReady = false
 
-function setStatus(text, error = false) {
-  const status = document.getElementById("status")
+let currentUserId = null
 
-  status.textContent = text
-  status.className = error ? "error" : ""
+let wallOffset = 0
+
+let wallFinished = false
+
+let wallLoading = false
+
+
+
+/* =========================
+   СТАТУС
+========================= */
+
+
+function setStatus(
+  text,
+  error = false
+) {
+
+  const status =
+    document.getElementById(
+      "status"
+    )
+
+
+  status.textContent =
+    text
+
+
+  status.className =
+    error
+      ? "error"
+      : ""
+
 }
 
-function getUserId(value) {
 
-  value = value.trim()
 
-  const match = value.match(
-    /(?:vk\.com|vk\.ru)\/id(\d+)/i
-  )
+/* =========================
+   ПОЛУЧЕНИЕ ID
+========================= */
+
+
+function getUserId(
+  value
+) {
+
+  value =
+    value.trim()
+
+
+  const match =
+    value.match(
+      /(?:vk\.com|vk\.ru)\/id(\d+)/i
+    )
+
 
   if (match) {
+
     return match[1]
+
   }
 
-  const directId = value.match(/^\d+$/)
+
+  const directId =
+    value.match(
+      /^\d+$/
+    )
+
 
   if (directId) {
+
     return directId[0]
+
   }
 
+
   return value
+
 }
+
+
+
+/* =========================
+   ЗАПУСК VK BRIDGE
+========================= */
+
 
 async function initVK() {
 
   try {
 
-    await vkBridge.send("VKWebAppInit")
+    await vkBridge.send(
+      "VKWebAppInit"
+    )
+
 
     vkReady = true
 
-    setStatus("VK Bridge работает")
+
+    setStatus(
+      "VK Bridge работает"
+    )
+
 
   } catch (error) {
 
-    console.error(error)
+    console.error(
+      "VK INIT ERROR:",
+      error
+    )
+
 
     setStatus(
       "ошибка запуска VK: " +
@@ -199,37 +466,66 @@ async function initVK() {
     )
 
   }
+
 }
+
+
+
+/* =========================
+   АВТОРИЗАЦИЯ
+========================= */
+
 
 async function getToken() {
 
   if (accessToken) {
+
     return accessToken
+
   }
 
-  setStatus("запрашиваю доступ к VK API...")
+
+  setStatus(
+    "запрашиваю доступ к VK API..."
+  )
+
 
   try {
 
-    const result = await vkBridge.send(
-      "VKWebAppGetAuthToken",
-      {
-        app_id: APP_ID,
-        scope: ""
-      }
-    )
+    const result =
+      await vkBridge.send(
+        "VKWebAppGetAuthToken",
+        {
+          app_id: APP_ID,
 
-    accessToken = result.access_token
+          scope: ""
+        }
+      )
+
+
+    accessToken =
+      result.access_token
+
 
     if (!accessToken) {
-      throw new Error("VK не вернул access token")
+
+      throw new Error(
+        "VK не вернул access token"
+      )
+
     }
+
 
     return accessToken
 
+
   } catch (error) {
 
-    console.error("AUTH ERROR:", error)
+    console.error(
+      "AUTH ERROR:",
+      error
+    )
+
 
     throw new Error(
       "ошибка авторизации: " +
@@ -237,46 +533,788 @@ async function getToken() {
     )
 
   }
+
 }
-async function showWall(userId) {
 
-  try {
 
-    const result =
-      await loadWall(
-        userId,
-        accessToken
-      )
 
-    console.log(
-      "СТЕНА ПРОФИЛЯ:",
-      result
+/* =========================
+   ОБЩИЙ ВЫЗОВ VK API
+========================= */
+
+
+async function callVK(
+  method,
+  params = {}
+) {
+
+  const token =
+    await getToken()
+
+
+  const result =
+    await vkBridge.send(
+      "VKWebAppCallAPIMethod",
+      {
+
+        method: method,
+
+        params: {
+
+          ...params,
+
+          access_token:
+            token,
+
+          v:
+            API_VERSION
+
+        }
+
+      }
     )
 
-    if (
-      result &&
-      result.response &&
-      result.response.items
-    ) {
 
-      console.log(
-        "ПУБЛИКАЦИИ:",
-        result.response.items
+  console.log(
+    "VK API:",
+    method,
+    result
+  )
+
+
+  if (
+    result &&
+    result.error
+  ) {
+
+    throw new Error(
+      `VK API ${method}: ` +
+      JSON.stringify(
+        result.error
+      )
+    )
+
+  }
+
+
+  return result
+
+}
+
+
+
+/* =========================
+   ФОРМАТ ДАТЫ
+========================= */
+
+
+function formatDate(
+  timestamp
+) {
+
+  if (!timestamp) {
+
+    return ""
+
+  }
+
+
+  const date =
+    new Date(
+      timestamp * 1000
+    )
+
+
+  return date.toLocaleString(
+    "ru-RU",
+    {
+      day: "2-digit",
+
+      month: "2-digit",
+
+      year: "numeric",
+
+      hour: "2-digit",
+
+      minute: "2-digit"
+    }
+  )
+
+}
+
+
+
+/* =========================
+   ВЛОЖЕНИЯ
+========================= */
+
+
+function renderAttachment(
+  attachment
+) {
+
+  const container =
+    document.createElement(
+      "div"
+    )
+
+
+  container.className =
+    "attachment"
+
+
+  if (!attachment) {
+
+    return container
+
+  }
+
+
+  /* ФОТО */
+
+  if (
+    attachment.type === "photo" &&
+    attachment.photo
+  ) {
+
+    const photo =
+      attachment.photo
+
+
+    const image =
+      document.createElement(
+        "img"
       )
 
-      alert(
-        "стена получена\n" +
-        "публикаций: " +
-        result.response.items.length
-      )
+
+    const sizes =
+      photo.sizes || []
+
+
+    if (sizes.length) {
+
+      image.src =
+        sizes[
+          sizes.length - 1
+        ].url
 
     } else {
 
-      alert(
-        "VK не вернул публикации\n\n" +
-        JSON.stringify(result)
-      )
+      image.src =
+        photo.url || ""
+
     }
+
+
+    image.alt =
+      photo.text ||
+      "фотография"
+
+
+    container.appendChild(
+      image
+    )
+
+
+    return container
+
+  }
+
+
+  /* ВИДЕО */
+
+  if (
+    attachment.type === "video" &&
+    attachment.video
+  ) {
+
+    const video =
+      attachment.video
+
+
+    container.textContent =
+      "видео: " +
+      (
+        video.title ||
+        "без названия"
+      )
+
+
+    return container
+
+  }
+
+
+  /* АУДИО */
+
+  if (
+    attachment.type === "audio" &&
+    attachment.audio
+  ) {
+
+    const audio =
+      attachment.audio
+
+
+    container.textContent =
+      "аудио: " +
+      (
+        audio.artist ||
+        ""
+      ) +
+      " - " +
+      (
+        audio.title ||
+        ""
+      )
+
+
+    return container
+
+  }
+
+
+  /* ДОКУМЕНТ */
+
+  if (
+    attachment.type === "doc" &&
+    attachment.doc
+  ) {
+
+    const doc =
+      attachment.doc
+
+
+    container.textContent =
+      "документ: " +
+      (
+        doc.title ||
+        "без названия"
+      )
+
+
+    return container
+
+  }
+
+
+  /* ССЫЛКА */
+
+  if (
+    attachment.type === "link" &&
+    attachment.link
+  ) {
+
+    const link =
+      attachment.link
+
+
+    const title =
+      link.title ||
+      link.url ||
+      "ссылка"
+
+
+    container.textContent =
+      "ссылка: " +
+      title
+
+
+    if (link.url) {
+
+      const a =
+        document.createElement(
+          "a"
+        )
+
+
+      a.href =
+        link.url
+
+
+      a.target =
+        "_blank"
+
+
+      a.rel =
+        "noopener noreferrer"
+
+
+      a.textContent =
+        link.url
+
+
+      container.appendChild(
+        a
+      )
+
+    }
+
+
+    return container
+
+  }
+
+
+  container.textContent =
+    "вложение: " +
+    (
+      attachment.type ||
+      "неизвестно"
+    )
+
+
+  return container
+
+}
+
+
+
+/* =========================
+   ОТОБРАЖЕНИЕ ПОСТА
+========================= */
+
+
+function renderPost(
+  post
+) {
+
+  const article =
+    document.createElement(
+      "article"
+    )
+
+
+  article.className =
+    "post"
+
+
+  /* ДАТА */
+
+  const date =
+    document.createElement(
+      "div"
+    )
+
+
+  date.className =
+    "post-date"
+
+
+  date.textContent =
+    formatDate(
+      post.date
+    )
+
+
+  article.appendChild(
+    date
+  )
+
+
+  /* ТЕКСТ */
+
+  if (post.text) {
+
+    const text =
+      document.createElement(
+        "div"
+      )
+
+
+    text.className =
+      "post-text"
+
+
+    text.textContent =
+      post.text
+
+
+    article.appendChild(
+      text
+    )
+
+  }
+
+
+  /* ВЛОЖЕНИЯ */
+
+  if (
+    post.attachments &&
+    post.attachments.length
+  ) {
+
+    post.attachments.forEach(
+      attachment => {
+
+        article.appendChild(
+          renderAttachment(
+            attachment
+          )
+        )
+
+      }
+    )
+
+  }
+
+
+  /* РЕПОСТ */
+
+  if (
+    post.copy_history &&
+    post.copy_history.length
+  ) {
+
+    const repost =
+      document.createElement(
+        "div"
+      )
+
+
+    repost.className =
+      "attachment"
+
+
+    repost.textContent =
+      "репост"
+
+
+    article.appendChild(
+      repost
+    )
+
+  }
+
+
+  /* СТАТИСТИКА */
+
+  const statsParts = []
+
+
+  if (
+    post.likes &&
+    post.likes.count != null
+  ) {
+
+    statsParts.push(
+      "лайки: " +
+      post.likes.count
+    )
+
+  }
+
+
+  if (
+    post.comments &&
+    post.comments.count != null
+  ) {
+
+    statsParts.push(
+      "комментарии: " +
+      post.comments.count
+    )
+
+  }
+
+
+  if (
+    post.reposts &&
+    post.reposts.count != null
+  ) {
+
+    statsParts.push(
+      "репосты: " +
+      post.reposts.count
+    )
+
+  }
+
+
+  if (
+    post.views &&
+    post.views.count != null
+  ) {
+
+    statsParts.push(
+      "просмотры: " +
+      post.views.count
+    )
+
+  }
+
+
+  if (statsParts.length) {
+
+    const stats =
+      document.createElement(
+        "div"
+      )
+
+
+    stats.className =
+      "post-stats"
+
+
+    stats.textContent =
+      statsParts.join(
+        " · "
+      )
+
+
+    article.appendChild(
+      stats
+    )
+
+  }
+
+
+  /* ССЫЛКА */
+
+  if (post.id) {
+
+    const link =
+      document.createElement(
+        "a"
+      )
+
+
+    link.className =
+      "post-link"
+
+
+    link.target =
+      "_blank"
+
+
+    link.rel =
+      "noopener noreferrer"
+
+
+    link.href =
+      "https://vk.com/wall" +
+      currentUserId +
+      "_" +
+      post.id
+
+
+    link.textContent =
+      "открыть публикацию VK"
+
+
+    article.appendChild(
+      link
+    )
+
+  }
+
+
+  return article
+
+}
+
+
+
+/* =========================
+   ЗАГРУЗКА СТЕНЫ
+========================= */
+
+
+async function loadWall(
+  reset = false
+) {
+
+  if (wallLoading) {
+
+    return
+
+  }
+
+
+  if (
+    wallFinished &&
+    !reset
+  ) {
+
+    return
+
+  }
+
+
+  wallLoading = true
+
+
+  const wall =
+    document.getElementById(
+      "wall"
+    )
+
+
+  const loadMoreButton =
+    document.getElementById(
+      "loadMoreButton"
+    )
+
+
+  if (reset) {
+
+    wallOffset = 0
+
+    wallFinished = false
+
+    wall.innerHTML = ""
+
+    loadMoreButton.style.display =
+      "none"
+
+  }
+
+
+  try {
+
+    setStatus(
+      reset
+        ? "получаю стену профиля..."
+        : "загружаю еще публикации..."
+    )
+
+
+    const result =
+      await callVK(
+        "wall.get",
+        {
+
+          owner_id:
+            Number(
+              currentUserId
+            ),
+
+          count:
+            10,
+
+          offset:
+            wallOffset,
+
+          filter:
+            "owner"
+
+        }
+      )
+
+
+    console.log(
+      "WALL RESPONSE:",
+      result
+    )
+
+
+    if (
+      !result ||
+      !result.response
+    ) {
+
+      throw new Error(
+        "VK не вернул стену: " +
+        JSON.stringify(
+          result
+        )
+      )
+
+    }
+
+
+    const response =
+      result.response
+
+
+    const posts =
+      response.items || []
+
+
+    if (!posts.length) {
+
+      wallFinished = true
+
+
+      if (
+        wallOffset === 0
+      ) {
+
+        const empty =
+          document.createElement(
+            "div"
+          )
+
+
+        empty.className =
+          "empty"
+
+
+        empty.textContent =
+          "публичных публикаций не найдено"
+
+
+        wall.appendChild(
+          empty
+        )
+
+      }
+
+
+      loadMoreButton.style.display =
+        "none"
+
+
+      setStatus(
+        "профиль найден"
+      )
+
+
+      return
+
+    }
+
+
+    posts.forEach(
+      post => {
+
+        wall.appendChild(
+          renderPost(
+            post
+          )
+        )
+
+      }
+    )
+
+
+    wallOffset +=
+      posts.length
+
+
+    if (
+      posts.length < 10 ||
+      wallOffset >= response.count
+    ) {
+
+      wallFinished = true
+
+
+      loadMoreButton.style.display =
+        "none"
+
+    } else {
+
+      loadMoreButton.style.display =
+        "block"
+
+    }
+
+
+    setStatus(
+      "профиль найден"
+    )
+
 
   } catch (error) {
 
@@ -285,48 +1323,115 @@ async function showWall(userId) {
       error
     )
 
-    alert(
-      "ошибка стены:\n" +
+
+    const errorBlock =
+      document.createElement(
+        "div"
+      )
+
+
+    errorBlock.className =
+      "empty error"
+
+
+    errorBlock.textContent =
+      "не удалось получить стену: " +
       error.message
+
+
+    wall.appendChild(
+      errorBlock
     )
+
+
+    loadMoreButton.style.display =
+      "none"
+
+
+    setStatus(
+      "профиль найден"
+    )
+
+
+  } finally {
+
+    wallLoading = false
+
   }
+
 }
+
+
+
+/* =========================
+   АНАЛИЗ ПРОФИЛЯ
+========================= */
+
+
 async function analyzeProfile() {
 
   const button =
-    document.getElementById("analyzeButton")
+    document.getElementById(
+      "analyzeButton"
+    )
+
 
   button.disabled = true
 
-  document.getElementById("profile").style.display =
+
+  document.getElementById(
+    "profile"
+  ).style.display =
     "none"
+
+
+  document.getElementById(
+    "wallSection"
+  ).style.display =
+    "none"
+
 
   try {
 
     if (!vkReady) {
-      throw new Error("VK Bridge еще не готов")
+
+      throw new Error(
+        "VK Bridge еще не готов"
+      )
+
     }
+
 
     const userId =
       getUserId(
-        document.getElementById("profileUrl").value
+        document.getElementById(
+          "profileUrl"
+        ).value
       )
 
+
     if (!userId) {
-      throw new Error("не указана ссылка на профиль")
+
+      throw new Error(
+        "не указана ссылка на профиль"
+      )
+
     }
 
-    const token = await getToken()
 
-    setStatus("получаю информацию о профиле...")
+    currentUserId =
+      userId
 
-    const result = await vkBridge.send(
-      "VKWebAppCallAPIMethod",
-      {
-        method: "users.get",
 
-        params: {
-          user_ids: userId,
+    /* ПОЛУЧАЕМ ПРОФИЛЬ */
+
+    const result =
+      await callVK(
+        "users.get",
+        {
+
+          user_ids:
+            userId,
 
           fields: [
             "photo_200",
@@ -348,16 +1453,17 @@ async function analyzeProfile() {
             "last_seen",
             "occupation",
             "relation"
-          ].join(","),
+          ].join(",")
 
-          access_token: token,
-
-          v: API_VERSION
         }
-      }
+      )
+
+
+    console.log(
+      "PROFILE RESPONSE:",
+      result
     )
 
-    console.log("VK RESPONSE:", result)
 
     if (
       !result ||
@@ -367,119 +1473,256 @@ async function analyzeProfile() {
 
       throw new Error(
         "VK не вернул данные пользователя: " +
-        JSON.stringify(result)
+        JSON.stringify(
+          result
+        )
       )
+
     }
 
-    const user = result.response[0]
-await showWall(
-  user.id
-)
-    document.getElementById("avatar").src =
+
+    const user =
+      result.response[0]
+
+
+    /* АВАТАР */
+
+    document.getElementById(
+      "avatar"
+    ).src =
       user.photo_200 || ""
 
-    document.getElementById("name").textContent =
-      `${user.first_name || ""} ${user.last_name || ""}`.trim()
+
+    /* ИМЯ */
+
+    document.getElementById(
+      "name"
+    ).textContent =
+      (
+        `${user.first_name || ""} ` +
+        `${user.last_name || ""}`
+      ).trim()
+
+
+    /* ИНФОРМАЦИЯ */
 
     const information = []
 
-    information.push(`VK ID: ${user.id}`)
 
-    if (user.screen_name) {
+    information.push(
+      "VK ID: " +
+      user.id
+    )
+
+
+    if (
+      user.screen_name
+    ) {
+
       information.push(
-        `адрес: vk.com/${user.screen_name}`
+        "адрес: vk.com/" +
+        user.screen_name
       )
+
     }
 
-    if (user.city?.title) {
+
+    if (
+      user.city &&
+      user.city.title
+    ) {
+
       information.push(
-        `город: ${user.city.title}`
+        "город: " +
+        user.city.title
       )
+
     }
 
-    if (user.country?.title) {
+
+    if (
+      user.country &&
+      user.country.title
+    ) {
+
       information.push(
-        `страна: ${user.country.title}`
+        "страна: " +
+        user.country.title
       )
+
     }
 
-    if (user.bdate) {
+
+    if (
+      user.bdate
+    ) {
+
       information.push(
-        `дата рождения: ${user.bdate}`
+        "дата рождения: " +
+        user.bdate
       )
+
     }
 
-    if (user.status) {
+
+    if (
+      user.status
+    ) {
+
       information.push(
-        `статус: ${user.status}`
+        "статус: " +
+        user.status
       )
+
     }
 
-    if (user.followers_count != null) {
+
+    if (
+      user.followers_count != null
+    ) {
+
       information.push(
-        `подписчики: ${user.followers_count}`
+        "подписчики: " +
+        user.followers_count
       )
+
     }
 
-    if (user.interests) {
+
+    if (
+      user.interests
+    ) {
+
       information.push(
-        `интересы: ${user.interests}`
+        "интересы: " +
+        user.interests
       )
+
     }
 
-    if (user.activities) {
+
+    if (
+      user.activities
+    ) {
+
       information.push(
-        `деятельность: ${user.activities}`
+        "деятельность: " +
+        user.activities
       )
+
     }
 
-    if (user.music) {
+
+    if (
+      user.music
+    ) {
+
       information.push(
-        `музыка: ${user.music}`
+        "музыка: " +
+        user.music
       )
+
     }
 
-    if (user.movies) {
+
+    if (
+      user.movies
+    ) {
+
       information.push(
-        `фильмы: ${user.movies}`
+        "фильмы: " +
+        user.movies
       )
+
     }
 
-    if (user.books) {
+
+    if (
+      user.books
+    ) {
+
       information.push(
-        `книги: ${user.books}`
+        "книги: " +
+        user.books
       )
+
     }
 
-    if (user.games) {
+
+    if (
+      user.games
+    ) {
+
       information.push(
-        `игры: ${user.games}`
+        "игры: " +
+        user.games
       )
+
     }
 
-    if (user.occupation?.name) {
+
+    if (
+      user.occupation &&
+      user.occupation.name
+    ) {
+
       information.push(
-        `работа: ${user.occupation.name}`
+        "работа: " +
+        user.occupation.name
       )
+
     }
 
-    document.getElementById("info").innerHTML =
+
+    document.getElementById(
+      "info"
+    ).innerHTML =
       information
-        .map(item => `<div>${item}</div>`)
+        .map(
+          item =>
+            "<div>" +
+            item +
+            "</div>"
+        )
         .join("")
 
-    document.getElementById("profile").style.display =
+
+    /* ПОКАЗЫВАЕМ ПРОФИЛЬ */
+
+    document.getElementById(
+      "profile"
+    ).style.display =
       "block"
 
-    setStatus("профиль найден")
+
+    /* ПОКАЗЫВАЕМ СТЕНУ */
+
+    document.getElementById(
+      "wallSection"
+    ).style.display =
+      "block"
+
+
+    /* ЗАГРУЖАЕМ СТЕНУ */
+
+    await loadWall(
+      true
+    )
+
 
   } catch (error) {
 
-    console.error("PROFILE ERROR:", error)
+    console.error(
+      "PROFILE ERROR:",
+      error
+    )
+
 
     setStatus(
       error.message ||
-      JSON.stringify(error),
+      JSON.stringify(
+        error
+      ),
       true
     )
 
@@ -488,20 +1731,54 @@ await showWall(
     button.disabled = false
 
   }
+
 }
 
+
+
+/* =========================
+   КНОПКИ
+========================= */
+
+
 document
-  .getElementById("analyzeButton")
+  .getElementById(
+    "analyzeButton"
+  )
   .addEventListener(
     "click",
     analyzeProfile
   )
 
+
+document
+  .getElementById(
+    "loadMoreButton"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      loadWall(
+        false
+      )
+
+    }
+  )
+
+
+
+/* =========================
+   ЗАПУСК
+========================= */
+
+
 initVK()
+
 
 </script>
 
-<script src="./wall.js?v=2"></script>
 
 </body>
+
 </html>
