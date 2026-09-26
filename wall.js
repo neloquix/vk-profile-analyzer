@@ -1,3 +1,4 @@
+alert("wall.js подключен")
 async function loadWall(userId, token) {
 
   const result = await vkBridge.send(
