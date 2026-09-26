@@ -378,17 +378,17 @@
 
         setStatus("профиль найден")
 
-      } catch (error) {
+          } catch (error) {
 
-        console.error(error)
+        console.error("VK ERROR:", error)
 
         setStatus(
-          "не удалось получить профиль: " +
-          (error.message || "неизвестная ошибка"),
+          "ошибка VK: " +
+          JSON.stringify(error),
           true
         )
 
-      } finally {
+    } finally {
 
         button.disabled = false
 
