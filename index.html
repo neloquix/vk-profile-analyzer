@@ -238,7 +238,59 @@ async function getToken() {
 
   }
 }
+async function showWall(userId) {
 
+  try {
+
+    const result =
+      await loadWall(
+        userId,
+        accessToken
+      )
+
+    console.log(
+      "СТЕНА ПРОФИЛЯ:",
+      result
+    )
+
+    if (
+      result &&
+      result.response &&
+      result.response.items
+    ) {
+
+      console.log(
+        "ПУБЛИКАЦИИ:",
+        result.response.items
+      )
+
+      alert(
+        "стена получена\n" +
+        "публикаций: " +
+        result.response.items.length
+      )
+
+    } else {
+
+      alert(
+        "VK не вернул публикации\n\n" +
+        JSON.stringify(result)
+      )
+    }
+
+  } catch (error) {
+
+    console.error(
+      "WALL ERROR:",
+      error
+    )
+
+    alert(
+      "ошибка стены:\n" +
+      error.message
+    )
+  }
+}
 async function analyzeProfile() {
 
   const button =
