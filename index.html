@@ -1,14 +1,10 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
-
 <head>
-
   <meta charset="UTF-8">
-
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0,
-    shrink-to-fit=no, user-scalable=no, viewport-fit=cover"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
   >
 
   <title>VK Profile Analyzer</title>
@@ -16,7 +12,6 @@
   <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 
   <style>
-
     * {
       box-sizing: border-box;
     }
@@ -24,4724 +19,1978 @@
     body {
       margin: 0;
       padding: 16px;
-
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-
       background: #f2f3f5;
       color: #111;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
     }
 
-    .container {
+    .app {
       max-width: 900px;
       margin: 0 auto;
     }
 
     h1 {
       margin: 0 0 6px;
-      font-size: 28px;
+      font-size: 26px;
     }
 
     .subtitle {
       color: #777;
       margin-bottom: 18px;
+      font-size: 14px;
+    }
+
+    .search-box,
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.05);
+    }
+
+    .search-row {
+      display: flex;
+      gap: 8px;
     }
 
     input {
-      width: 100%;
-      padding: 15px;
-
-      border: 1px solid #ccc;
+      flex: 1;
+      min-width: 0;
+      padding: 13px 14px;
+      border: 1px solid #d9dce1;
       border-radius: 12px;
+      font-size: 15px;
+      outline: none;
+      background: #fff;
+    }
 
-      font-size: 16px;
-      background: white;
-
-      margin-bottom: 10px;
+    input:focus {
+      border-color: #447bba;
     }
 
     button {
-      width: 100%;
-
-      padding: 14px 16px;
-
       border: 0;
       border-radius: 12px;
-
+      padding: 12px 16px;
       background: #447bba;
-      color: white;
-
+      color: #fff;
       font-size: 15px;
       font-weight: 600;
-
       cursor: pointer;
     }
 
     button:disabled {
       opacity: .55;
+      cursor: default;
     }
 
-    .small-button {
-      width: auto;
-      padding: 9px 13px;
-      font-size: 13px;
+    .example {
+      margin-top: 9px;
+      color: #888;
+      font-size: 12px;
     }
 
-    #status {
-      margin-top: 14px;
-      color: #666;
-      word-break: break-word;
-    }
-
-    .error {
-      color: #d33 !important;
-    }
-
-    .profile {
-      display: none;
-
-      margin-top: 18px;
-      padding: 20px;
-
-      background: white;
-      border-radius: 18px;
-    }
-
-    .profile-top {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
-
-    .avatar {
-      width: 100px;
-      height: 100px;
-
-      border-radius: 50%;
-      object-fit: cover;
-
-      background: #eee;
-      flex-shrink: 0;
-    }
-
-    .name {
-      font-size: 25px;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    .subline {
-      color: #777;
+    .status {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #fff;
+      margin-bottom: 14px;
       font-size: 14px;
     }
 
-    .info {
-      margin-top: 18px;
-      color: #444;
-      line-height: 1.65;
+    .error {
+      color: #c62828;
+      background: #ffebee;
     }
 
-    .info-row {
-      padding: 5px 0;
-      border-bottom: 1px solid #f0f0f0;
+    .success {
+      color: #176b35;
+      background: #e8f5e9;
     }
 
-    .info-row:last-child {
-      border-bottom: 0;
+    .profile {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .avatar {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #ddd;
+      flex-shrink: 0;
+    }
+
+    .profile-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .name {
+      font-size: 23px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .screen {
+      color: #777;
+      margin-bottom: 10px;
+      word-break: break-all;
+    }
+
+    .online {
+      color: #1a9b4b;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .verified {
+      display: inline-block;
+      padding: 3px 7px;
+      border-radius: 7px;
+      background: #e7f1ff;
+      color: #3675bd;
+      font-size: 11px;
+      margin-left: 5px;
+      vertical-align: middle;
+    }
+
+    .bio {
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: #333;
+      line-height: 1.45;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .item {
+      background: #f5f6f8;
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .label {
+      color: #888;
+      font-size: 11px;
+      margin-bottom: 3px;
+    }
+
+    .value {
+      font-size: 14px;
+      word-break: break-word;
     }
 
     .tabs {
-      display: none;
-
-      margin-top: 16px;
-
-      overflow-x: auto;
-
+      display: flex;
       gap: 7px;
-
-      padding-bottom: 4px;
+      overflow-x: auto;
+      padding-bottom: 3px;
+      margin-bottom: 14px;
     }
 
     .tab {
-      width: auto;
       white-space: nowrap;
-
-      background: white;
-      color: #447bba;
-
-      border: 1px solid #d8d8d8;
-
-      padding: 10px 13px;
+      background: #e5e7eb;
+      color: #333;
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      cursor: pointer;
     }
 
     .tab.active {
       background: #447bba;
       color: white;
-      border-color: #447bba;
     }
 
     .section {
       display: none;
-      margin-top: 16px;
     }
 
-    .section-title {
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 12px;
-    }
-
-    .section-description {
-      color: #777;
-      font-size: 13px;
-      margin-bottom: 12px;
-    }
-
-    .card {
-      background: white;
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 12px;
+    .section.active {
+      display: block;
     }
 
     .post {
-      background: white;
-      border-radius: 16px;
-      padding: 17px;
-      margin-bottom: 12px;
+      background: #fff;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.04);
     }
 
     .post-date {
       color: #888;
-      font-size: 13px;
-      margin-bottom: 10px;
+      font-size: 12px;
+      margin-bottom: 8px;
     }
 
     .post-text {
       white-space: pre-wrap;
       word-break: break-word;
-      line-height: 1.5;
-      margin-bottom: 12px;
+      line-height: 1.45;
     }
 
     .post-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 10px;
       color: #777;
-      font-size: 13px;
-      margin-top: 12px;
-    }
-
-    .post-link {
-      display: block;
-
-      margin-top: 10px;
-
-      color: #447bba;
-
-      text-decoration: none;
-
-      word-break: break-all;
-    }
-
-    .attachment {
-      margin-top: 10px;
-
-      padding: 10px;
-
-      background: #f2f3f5;
-
-      border-radius: 10px;
-
-      font-size: 14px;
-    }
-
-    .attachment img {
-      width: 100%;
-      max-height: 500px;
-
-      object-fit: contain;
-
-      border-radius: 10px;
-
-      display: block;
+      font-size: 12px;
     }
 
     .photo-grid {
       display: grid;
-
-      grid-template-columns:
-        repeat(3, 1fr);
-
-      gap: 6px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
     }
 
     .photo-grid img {
       width: 100%;
-      aspect-ratio: 1 / 1;
-
+      aspect-ratio: 1;
       object-fit: cover;
-
       border-radius: 8px;
-
-      background: #eee;
+      background: #ddd;
     }
 
-    .album {
-      background: white;
-      border-radius: 16px;
-      padding: 14px;
-      margin-bottom: 12px;
-    }
-
-    .album-title {
-      font-weight: 700;
-      margin-bottom: 5px;
-    }
-
-    .album-meta {
-      color: #777;
-      font-size: 13px;
-      margin-bottom: 10px;
-    }
-
-    .video-card {
+    .list {
       display: flex;
-      gap: 12px;
-      align-items: flex-start;
-    }
-
-    .video-image {
-      width: 150px;
-      height: 90px;
-
-      object-fit: cover;
-
-      border-radius: 10px;
-
-      background: #eee;
-
-      flex-shrink: 0;
-    }
-
-    .video-title {
-      font-weight: 700;
-      margin-bottom: 5px;
-    }
-
-    .video-meta {
-      color: #777;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .person {
-      display: flex;
-
-      align-items: center;
-
-      gap: 11px;
-
-      padding: 10px 0;
-
-      border-bottom: 1px solid #eee;
-    }
-
-    .person:last-child {
-      border-bottom: 0;
-    }
-
-    .person-avatar {
-      width: 48px;
-      height: 48px;
-
-      border-radius: 50%;
-
-      object-fit: cover;
-
-      background: #eee;
-
-      flex-shrink: 0;
-    }
-
-    .person-name {
-      font-weight: 600;
-    }
-
-    .person-meta {
-      color: #777;
-      font-size: 12px;
-      margin-top: 2px;
-    }
-
-    .community {
-      display: flex;
-
-      gap: 11px;
-
-      align-items: center;
-
-      padding: 10px 0;
-
-      border-bottom: 1px solid #eee;
-    }
-
-    .community img {
-      width: 48px;
-      height: 48px;
-
-      border-radius: 12px;
-
-      object-fit: cover;
-
-      background: #eee;
-    }
-
-    .community-name {
-      font-weight: 600;
-    }
-
-    .community-meta {
-      color: #777;
-      font-size: 12px;
-      margin-top: 2px;
-    }
-
-    .audio {
-      padding: 12px;
-
-      background: white;
-
-      border-radius: 12px;
-
-      margin-bottom: 8px;
-    }
-
-    .audio-title {
-      font-weight: 600;
-    }
-
-    .audio-meta {
-      color: #777;
-      font-size: 13px;
-      margin-top: 3px;
-    }
-
-    .document {
-      background: white;
-
-      border-radius: 12px;
-
-      padding: 13px;
-
-      margin-bottom: 8px;
-    }
-
-    .document-title {
-      font-weight: 600;
-    }
-
-    .document-meta {
-      color: #777;
-      font-size: 13px;
-      margin-top: 4px;
-    }
-
-    .comment {
-      margin-top: 10px;
-
-      padding: 10px;
-
-      background: #f5f5f5;
-
-      border-radius: 10px;
-    }
-
-    .comment-name {
-      font-weight: 600;
-      font-size: 14px;
-    }
-
-    .comment-text {
-      margin-top: 5px;
-
-      white-space: pre-wrap;
-
-      word-break: break-word;
-
-      font-size: 14px;
-
-      line-height: 1.45;
-    }
-
-    .comment-date {
-      color: #888;
-      font-size: 11px;
-      margin-top: 5px;
-    }
-
-    .link-item {
-      display: block;
-
-      padding: 12px;
-
-      background: white;
-
-      border-radius: 12px;
-
-      margin-bottom: 8px;
-
-      color: #447bba;
-
-      text-decoration: none;
-
-      word-break: break-all;
-    }
-
-    .mention {
-      padding: 10px;
-
-      background: white;
-
-      border-radius: 12px;
-
-      margin-bottom: 8px;
-
-      word-break: break-word;
-    }
-
-    .timeline-item {
-      display: flex;
-
-      gap: 12px;
-
-      padding: 12px 0;
-
-      border-bottom: 1px solid #eee;
-    }
-
-    .timeline-date {
-      width: 105px;
-
-      color: #777;
-
-      font-size: 12px;
-
-      flex-shrink: 0;
-    }
-
-    .timeline-content {
-      line-height: 1.45;
-    }
-
-    .history-item {
-      background: white;
-
-      border-radius: 12px;
-
-      padding: 13px;
-
-      margin-bottom: 8px;
-    }
-
-    .history-date {
-      color: #777;
-      font-size: 12px;
-      margin-bottom: 5px;
-    }
-
-    .limit {
-      background: #fff8df;
-
-      border: 1px solid #eadb99;
-
-      border-radius: 12px;
-
-      padding: 12px;
-
-      margin-bottom: 8px;
-
-      color: #675b2c;
-
-      line-height: 1.45;
-    }
-
-    .empty {
-      background: white;
-
-      border-radius: 16px;
-
-      padding: 18px;
-
-      color: #777;
-
-      line-height: 1.5;
-    }
-
-    .loader {
-      padding: 15px;
-
-      color: #777;
-
-      text-align: center;
-    }
-
-    .load-more {
-      margin-top: 4px;
-      margin-bottom: 20px;
-    }
-
-    .external-grid {
-      display: grid;
-
-      grid-template-columns:
-        repeat(2, 1fr);
-
+      flex-direction: column;
       gap: 8px;
     }
 
-    .external-link {
-      display: block;
-
-      padding: 13px;
-
-      background: white;
-
+    .list-item {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      background: #fff;
+      padding: 10px;
       border-radius: 12px;
+    }
 
-      color: #447bba;
+    .small-avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #ddd;
+      flex-shrink: 0;
+    }
 
-      text-decoration: none;
+    .list-main {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .list-name {
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    .list-sub {
+      color: #888;
+      font-size: 12px;
+      margin-top: 2px;
+      word-break: break-word;
+    }
+
+    .empty {
+      padding: 25px;
+      text-align: center;
+      color: #888;
+      background: #fff;
+      border-radius: 14px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 25px;
+      color: #777;
+    }
+
+    .link {
+      color: #3675bd;
+      word-break: break-all;
+    }
+
+    .limit {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #666;
     }
 
     @media (max-width: 600px) {
-
       body {
-        padding: 12px;
+        padding: 10px;
       }
 
-      .profile-top {
-        align-items: flex-start;
+      .search-row {
+        flex-direction: column;
       }
 
-      .avatar {
-        width: 82px;
-        height: 82px;
+      .profile {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
       }
 
-      .name {
-        font-size: 21px;
-      }
-
-      .photo-grid {
-        grid-template-columns:
-          repeat(3, 1fr);
-      }
-
-      .video-card {
-        display: block;
-      }
-
-      .video-image {
-        width: 100%;
-        height: auto;
-        aspect-ratio: 16 / 9;
-        margin-bottom: 8px;
-      }
-
-      .external-grid {
+      .grid {
         grid-template-columns: 1fr;
       }
 
+      .photo-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
     }
-
   </style>
-
 </head>
-
 
 <body>
 
-
-<div class="container">
-
+<div class="app">
 
   <h1>VK Profile Analyzer</h1>
-
   <div class="subtitle">
-    публичная информация профиля VK
+    анализ публичной информации профиля VK
   </div>
 
-
-  <input
-    id="profileUrl"
-    type="text"
-    placeholder="вставь ссылку на профиль VK"
-    value="https://vk.ru/id802548516"
-  >
-
-
-  <button id="analyzeButton">
-    анализировать профиль
-  </button>
-
-
-  <div id="status">
-    подключение к VK...
-  </div>
-
-
-  <div
-    id="profile"
-    class="profile"
-  >
-
-    <div class="profile-top">
-
-      <img
-        id="avatar"
-        class="avatar"
-        src=""
-        alt=""
+  <div class="search-box">
+    <div class="search-row">
+      <input
+        id="profileInput"
+        type="text"
+        placeholder="вставьте ссылку на профиль VK"
+        autocomplete="off"
+        autocapitalize="none"
       >
+      <button id="analyzeButton">
+        анализировать
+      </button>
+    </div>
 
-      <div>
+    <div class="example">
+      например: https://vk.com/id123456 или https://vk.com/username
+    </div>
+  </div>
 
-        <div
-          id="name"
-          class="name"
-        ></div>
+  <div id="status"></div>
 
-        <div
-          id="subline"
-          class="subline"
-        ></div>
+  <div id="profileCard"></div>
 
+  <div id="tabsContainer" style="display:none">
+    <div class="tabs" id="tabs">
+
+      <div class="tab active" data-tab="overview">обзор</div>
+      <div class="tab" data-tab="wall">стена</div>
+      <div class="tab" data-tab="photos">фото</div>
+      <div class="tab" data-tab="videos">видео</div>
+      <div class="tab" data-tab="audio">аудио</div>
+      <div class="tab" data-tab="docs">документы</div>
+      <div class="tab" data-tab="friends">друзья</div>
+      <div class="tab" data-tab="followers">подписчики</div>
+      <div class="tab" data-tab="subscriptions">подписки</div>
+      <div class="tab" data-tab="groups">сообщества</div>
+      <div class="tab" data-tab="links">ссылки</div>
+      <div class="tab" data-tab="mentions">упоминания</div>
+      <div class="tab" data-tab="timeline">таймлайн</div>
+      <div class="tab" data-tab="history">история</div>
+      <div class="tab" data-tab="limits">ограничения</div>
+
+    </div>
+  </div>
+
+  <div id="sections">
+
+    <div class="section active" id="overview"></div>
+    <div class="section" id="wall"></div>
+    <div class="section" id="photos"></div>
+    <div class="section" id="videos"></div>
+    <div class="section" id="audio"></div>
+    <div class="section" id="docs"></div>
+    <div class="section" id="friends"></div>
+    <div class="section" id="followers"></div>
+    <div class="section" id="subscriptions"></div>
+    <div class="section" id="groups"></div>
+    <div class="section" id="links"></div>
+    <div class="section" id="mentions"></div>
+    <div class="section" id="timeline"></div>
+    <div class="section" id="history"></div>
+
+    <div class="section" id="limits">
+      <div class="card limit">
+        <b>важно</b><br><br>
+
+        приложение анализирует только ту информацию, которую VK
+        предоставляет через доступные API и которую разрешено получать
+        в рамках публичного доступа и авторизации мини-приложения
+        <br><br>
+
+        закрытые профили, скрытые друзья, приватные сообщества,
+        личные сообщения, удаленные материалы, историю браузера,
+        поисковые запросы и другие закрытые данные получить нельзя
+        <br><br>
+
+        отсутствие информации в результате не означает, что такой
+        информации у пользователя вообще не существует
       </div>
-
     </div>
-
-
-    <div
-      id="info"
-      class="info"
-    ></div>
 
   </div>
-
-
-  <div
-    id="tabs"
-    class="tabs"
-  >
-
-    <button
-      class="tab active"
-      data-section="overview"
-    >
-      обзор
-    </button>
-
-    <button
-      class="tab"
-      data-section="wall"
-    >
-      стена
-    </button>
-
-    <button
-      class="tab"
-      data-section="photos"
-    >
-      фото
-    </button>
-
-    <button
-      class="tab"
-      data-section="videos"
-    >
-      видео
-    </button>
-
-    <button
-      class="tab"
-      data-section="audio"
-    >
-      аудио
-    </button>
-
-    <button
-      class="tab"
-      data-section="documents"
-    >
-      документы
-    </button>
-
-    <button
-      class="tab"
-      data-section="friends"
-    >
-      друзья
-    </button>
-
-    <button
-      class="tab"
-      data-section="followers"
-    >
-      подписчики
-    </button>
-
-    <button
-      class="tab"
-      data-section="subscriptions"
-    >
-      подписки
-    </button>
-
-    <button
-      class="tab"
-      data-section="groups"
-    >
-      сообщества
-    </button>
-
-    <button
-      class="tab"
-      data-section="links"
-    >
-      ссылки
-    </button>
-
-    <button
-      class="tab"
-      data-section="mentions"
-    >
-      упоминания
-    </button>
-
-    <button
-      class="tab"
-      data-section="timeline"
-    >
-      таймлайн
-    </button>
-
-    <button
-      class="tab"
-      data-section="history"
-    >
-      история
-    </button>
-
-    <button
-      class="tab"
-      data-section="limits"
-    >
-      ограничения
-    </button>
-
-  </div>
-
-
-  <!-- ОБЗОР -->
-
-  <section
-    id="section-overview"
-    class="section"
-  >
-
-    <div class="section-title">
-      обзор
-    </div>
-
-    <div id="overview"></div>
-
-  </section>
-
-
-  <!-- СТЕНА -->
-
-  <section
-    id="section-wall"
-    class="section"
-  >
-
-    <div class="section-title">
-      стена
-    </div>
-
-    <div id="wall"></div>
-
-    <button
-      id="wallMore"
-      class="load-more"
-      style="display:none"
-    >
-      загрузить еще
-    </button>
-
-  </section>
-
-
-  <!-- ФОТО -->
-
-  <section
-    id="section-photos"
-    class="section"
-  >
-
-    <div class="section-title">
-      фотографии
-    </div>
-
-    <div id="albums"></div>
-
-    <div id="photos"></div>
-
-  </section>
-
-
-  <!-- ВИДЕО -->
-
-  <section
-    id="section-videos"
-    class="section"
-  >
-
-    <div class="section-title">
-      видео
-    </div>
-
-    <div id="videos"></div>
-
-  </section>
-
-
-  <!-- АУДИО -->
-
-  <section
-    id="section-audio"
-    class="section"
-  >
-
-    <div class="section-title">
-      аудио
-    </div>
-
-    <div id="audio"></div>
-
-  </section>
-
-
-  <!-- ДОКУМЕНТЫ -->
-
-  <section
-    id="section-documents"
-    class="section"
-  >
-
-    <div class="section-title">
-      документы
-    </div>
-
-    <div id="documents"></div>
-
-  </section>
-
-
-  <!-- ДРУЗЬЯ -->
-
-  <section
-    id="section-friends"
-    class="section"
-  >
-
-    <div class="section-title">
-      друзья
-    </div>
-
-    <div id="friends"></div>
-
-  </section>
-
-
-  <!-- ПОДПИСЧИКИ -->
-
-  <section
-    id="section-followers"
-    class="section"
-  >
-
-    <div class="section-title">
-      подписчики
-    </div>
-
-    <div id="followers"></div>
-
-  </section>
-
-
-  <!-- ПОДПИСКИ -->
-
-  <section
-    id="section-subscriptions"
-    class="section"
-  >
-
-    <div class="section-title">
-      подписки
-    </div>
-
-    <div id="subscriptions"></div>
-
-  </section>
-
-
-  <!-- СООБЩЕСТВА -->
-
-  <section
-    id="section-groups"
-    class="section"
-  >
-
-    <div class="section-title">
-      сообщества
-    </div>
-
-    <div id="groups"></div>
-
-  </section>
-
-
-  <!-- ССЫЛКИ -->
-
-  <section
-    id="section-links"
-    class="section"
-  >
-
-    <div class="section-title">
-      ссылки
-    </div>
-
-    <div
-      class="section-description"
-    >
-      ссылки, найденные в публичных данных профиля и публикациях
-    </div>
-
-    <div id="links"></div>
-
-  </section>
-
-
-  <!-- УПОМИНАНИЯ -->
-
-  <section
-    id="section-mentions"
-    class="section"
-  >
-
-    <div class="section-title">
-      упоминания
-    </div>
-
-    <div
-      class="section-description"
-    >
-      упоминания пользователей и сообществ, которые удалось обнаружить в тексте публикаций
-    </div>
-
-    <div id="mentions"></div>
-
-  </section>
-
-
-  <!-- ТАЙМЛАЙН -->
-
-  <section
-    id="section-timeline"
-    class="section"
-  >
-
-    <div class="section-title">
-      таймлайн
-    </div>
-
-    <div id="timeline"></div>
-
-  </section>
-
-
-  <!-- ИСТОРИЯ -->
-
-  <section
-    id="section-history"
-    class="section"
-  >
-
-    <div class="section-title">
-      история наблюдений
-    </div>
-
-    <div
-      class="section-description"
-    >
-      сохраняются только снимки, которые это приложение само получило во время предыдущих анализов
-    </div>
-
-    <div id="history"></div>
-
-  </section>
-
-
-  <!-- ОГРАНИЧЕНИЯ -->
-
-  <section
-    id="section-limits"
-    class="section"
-  >
-
-    <div class="section-title">
-      ограничения
-    </div>
-
-    <div id="limits"></div>
-
-  </section>
-
 
 </div>
 
-
 <script>
 
+  const bridge = window.vkBridge
 
-const APP_ID = 54790628
+  let accessToken = null
+  let currentUser = null
+  let currentData = {}
+  let snapshotKey = null
 
-const API_VERSION = "5.199"
+  const input = document.getElementById("profileInput")
+  const button = document.getElementById("analyzeButton")
+  const statusBox = document.getElementById("status")
+  const profileCard = document.getElementById("profileCard")
+  const tabsContainer = document.getElementById("tabsContainer")
 
+  function escapeHtml(value) {
 
-let accessToken = null
+    if (value === null || value === undefined) {
+      return ""
+    }
 
-let vkReady = false
-
-let currentUserId = null
-
-let currentUser = null
-
-let currentData = {}
-
-let wallOffset = 0
-
-let wallLoading = false
-
-let wallFinished = false
-
-
-const limits = []
-
-
-function setStatus(
-  text,
-  error = false
-) {
-
-  const element =
-    document.getElementById(
-      "status"
-    )
-
-  element.textContent =
-    text
-
-  element.className =
-    error
-      ? "error"
-      : ""
-
-}
-
-
-function addLimit(
-  title,
-  text
-) {
-
-  limits.push({
-    title,
-    text
-  })
-
-}
-
-
-function clearLimits() {
-
-  limits.length = 0
-
-}
-
-
-function getUserId(
-  value
-) {
-
-  value =
-    value.trim()
-
-  const match =
-    value.match(
-      /(?:vk\.com|vk\.ru)\/id(\d+)/i
-    )
-
-  if (match) {
-    return match[1]
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;")
   }
 
-  const direct =
-    value.match(
-      /^\d+$/
-    )
+  function setStatus(text, type = "") {
 
-  if (direct) {
-    return direct[0]
+    statusBox.className = "status " + type
+    statusBox.textContent = text
   }
 
-  const screen =
-    value.match(
-      /(?:vk\.com|vk\.ru)\/([^/?#]+)/i
-    )
+  function clearStatus() {
 
-  if (screen) {
-    return screen[1]
+    statusBox.className = ""
+    statusBox.textContent = ""
   }
 
-  return value
-}
+  function normalizeProfileInput(value) {
 
+    value = value.trim()
 
-async function initVK() {
+    if (!value) {
+      return null
+    }
 
-  try {
+    value = value.replace(/^https?:\/\//i, "")
+    value = value.replace(/^www\./i, "")
 
-    await vkBridge.send(
-      "VKWebAppInit"
-    )
+    value = value.split("?")[0]
+    value = value.split("#")[0]
 
-    vkReady = true
+    value = value.replace(/^vk\.com\//i, "")
+    value = value.replace(/^vk\.ru\//i, "")
 
-    setStatus(
-      "VK Bridge работает"
-    )
+    value = value.replace(/^@/, "")
 
-  } catch (error) {
+    value = value.replace(/\/+$/, "")
 
-    console.error(
-      error
-    )
+    if (!value) {
+      return null
+    }
 
-    setStatus(
-      "ошибка запуска VK: " +
-      JSON.stringify(error),
-      true
-    )
-
+    return value
   }
 
-}
+  function isNumericId(value) {
 
-
-async function getToken() {
-
-  if (accessToken) {
-    return accessToken
+    return /^\d+$/.test(value)
   }
 
-  setStatus(
-    "запрашиваю доступ к VK API..."
-  )
+  async function initVK() {
 
-  try {
+    try {
 
-    const result =
-      await vkBridge.send(
-        "VKWebAppGetAuthToken",
-        {
-          app_id: APP_ID,
-          scope: ""
-        }
+      await bridge.send("VKWebAppInit")
+
+      const auth = await bridge.send("VKWebAppGetAuthToken", {
+        app_id: 54790628,
+        scope: ""
+      })
+
+      accessToken = auth.access_token
+
+      return true
+
+    } catch (error) {
+
+      console.error(error)
+
+      setStatus(
+        "не удалось авторизовать мини-приложение VK",
+        "error"
       )
 
-    accessToken =
-      result.access_token
+      return false
+    }
+  }
+
+  async function api(method, params = {}) {
 
     if (!accessToken) {
+      throw new Error("нет access token")
+    }
+
+    const result = await bridge.send("VKWebAppCallAPIMethod", {
+      method,
+      request_id: "request_" + Date.now() + "_" + Math.random(),
+      params: {
+        ...params,
+        access_token: accessToken,
+        v: "5.199"
+      }
+    })
+
+    if (result && result.response) {
+      return result.response
+    }
+
+    if (result && result.error) {
       throw new Error(
-        "VK не вернул access token"
+        result.error.error_msg ||
+        result.error.error_text ||
+        "ошибка VK API"
       )
     }
 
-    return accessToken
-
-  } catch (error) {
-
-    console.error(
-      "AUTH ERROR",
-      error
-    )
-
-    throw new Error(
-      "ошибка авторизации: " +
-      JSON.stringify(error)
-    )
-
+    throw new Error("неизвестный ответ VK API")
   }
 
-}
+  async function resolveUser(value) {
 
+    const normalized = normalizeProfileInput(value)
 
-async function callVK(
-  method,
-  params = {}
-) {
+    if (!normalized) {
+      throw new Error("вставьте ссылку или имя пользователя VK")
+    }
 
-  const token =
-    await getToken()
+    if (isNumericId(normalized)) {
 
-  const result =
-    await vkBridge.send(
-      "VKWebAppCallAPIMethod",
-      {
-        method,
+      const result = await api("users.get", {
+        user_ids: normalized,
+        fields:
+          "photo_200,photo_400_orig,city,country,bdate,sex,status,about,activities,interests,books,movies,music,games,site,followers_count,verified,last_seen,occupation,relation,contacts,education,universities,schools,screen_name"
+      })
 
-        params: {
-          ...params,
-
-          access_token:
-            token,
-
-          v:
-            API_VERSION
-        }
+      if (!result.items || !result.items.length) {
+        throw new Error("пользователь не найден")
       }
-    )
 
-  console.log(
-    method,
-    result
-  )
+      return result.items[0]
+    }
 
-  if (
-    result &&
-    result.error
-  ) {
+    const result = await api("users.get", {
+      user_ids: normalized,
+      fields:
+        "photo_200,photo_400_orig,city,country,bdate,sex,status,about,activities,interests,books,movies,music,games,site,followers_count,verified,last_seen,occupation,relation,contacts,education,universities,schools,screen_name"
+    })
 
-    throw new Error(
-      `VK API ${method}: ` +
-      JSON.stringify(
-        result.error
+    if (!result.items || !result.items.length) {
+      throw new Error(
+        "не удалось найти этот профиль VK"
       )
-    )
+    }
 
+    return result.items[0]
   }
 
-  return result
+  function formatDate(timestamp) {
 
-}
+    if (!timestamp) {
+      return "неизвестно"
+    }
 
+    try {
 
-function formatDate(
-  timestamp
-) {
+      return new Date(timestamp * 1000).toLocaleString("ru-RU")
 
-  if (!timestamp) {
+    } catch {
+
+      return "неизвестно"
+    }
+  }
+
+  function field(label, value) {
+
+    if (
+      value === undefined ||
+      value === null ||
+      value === "" ||
+      value === 0
+    ) {
+      return ""
+    }
+
+    return `
+      <div class="item">
+        <div class="label">${escapeHtml(label)}</div>
+        <div class="value">${escapeHtml(value)}</div>
+      </div>
+    `
+  }
+
+  function occupationText(user) {
+
+    if (!user.occupation) {
+      return ""
+    }
+
+    let result = []
+
+    if (user.occupation.type) {
+      result.push(user.occupation.type)
+    }
+
+    if (user.occupation.name) {
+      result.push(user.occupation.name)
+    }
+
+    return result.join(": ")
+  }
+
+  function relationText(value) {
+
+    const map = {
+      1: "не женат / не замужем",
+      2: "есть друг / есть подруга",
+      3: "помолвлен / помолвлена",
+      4: "женат / замужем",
+      5: "все сложно",
+      6: "в активном поиске",
+      7: "влюблен / влюблена",
+      8: "гражданский брак"
+    }
+
+    return map[value] || ""
+  }
+
+  function sexText(value) {
+
+    if (value === 1) return "женский"
+    if (value === 2) return "мужской"
+
     return ""
   }
 
-  return new Date(
-    timestamp * 1000
-  ).toLocaleString(
-    "ru-RU",
-    {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    }
-  )
+  function renderProfile(user) {
 
-}
+    const online =
+      user.last_seen &&
+      user.last_seen.time &&
+      Date.now() / 1000 - user.last_seen.time < 300
 
+    profileCard.innerHTML = `
+      <div class="card">
 
-function escapeHTML(
-  value
-) {
+        <div class="profile">
 
-  return String(
-    value ?? ""
-  )
-    .replaceAll(
-      "&",
-      "&amp;"
-    )
-    .replaceAll(
-      "<",
-      "&lt;"
-    )
-    .replaceAll(
-      ">",
-      "&gt;"
-    )
-    .replaceAll(
-      '"',
-      "&quot;"
-    )
-
-}
-
-
-function showSection(
-  name
-) {
-
-  document
-    .querySelectorAll(
-      ".section"
-    )
-    .forEach(
-      element => {
-
-        element.style.display =
-          "none"
-
-      }
-    )
-
-  document
-    .querySelectorAll(
-      ".tab"
-    )
-    .forEach(
-      element => {
-
-        element.classList.remove(
-          "active"
-        )
-
-      }
-    )
-
-  const section =
-    document.getElementById(
-      "section-" +
-      name
-    )
-
-  if (section) {
-
-    section.style.display =
-      "block"
-
-  }
-
-  const tab =
-    document.querySelector(
-      `[data-section="${name}"]`
-    )
-
-  if (tab) {
-
-    tab.classList.add(
-      "active"
-    )
-
-  }
-
-}
-
-
-document
-  .querySelectorAll(
-    ".tab"
-  )
-  .forEach(
-    tab => {
-
-      tab.addEventListener(
-        "click",
-        () => {
-
-          showSection(
-            tab.dataset.section
-          )
-
-        }
-      )
-
-    }
-  )
-
-
-function renderProfile(
-  user
-) {
-
-  currentUser =
-    user
-
-  document.getElementById(
-    "avatar"
-  ).src =
-    user.photo_200 ||
-    user.photo_100 ||
-    ""
-
-  document.getElementById(
-    "name"
-  ).textContent =
-    (
-      `${user.first_name || ""} ` +
-      `${user.last_name || ""}`
-    ).trim()
-
-  document.getElementById(
-    "subline"
-  ).textContent =
-    user.screen_name
-      ? "@" + user.screen_name
-      : "VK ID: " + user.id
-
-
-  const fields = []
-
-  function add(
-    label,
-    value
-  ) {
-
-    if (
-      value !== undefined &&
-      value !== null &&
-      value !== ""
-    ) {
-
-      fields.push(
-        `<div class="info-row">
-          <b>${escapeHTML(label)}:</b>
-          ${escapeHTML(value)}
-        </div>`
-      )
-
-    }
-
-  }
-
-
-  add(
-    "VK ID",
-    user.id
-  )
-
-  add(
-    "адрес",
-    user.screen_name
-      ? "vk.com/" +
-        user.screen_name
-      : ""
-  )
-
-  add(
-    "город",
-    user.city &&
-    user.city.title
-  )
-
-  add(
-    "страна",
-    user.country &&
-    user.country.title
-  )
-
-  add(
-    "дата рождения",
-    user.bdate
-  )
-
-  add(
-    "пол",
-    user.sex === 1
-      ? "женский"
-      : user.sex === 2
-        ? "мужской"
-        : ""
-  )
-
-  add(
-    "статус",
-    user.status
-  )
-
-  add(
-    "о себе",
-    user.about
-  )
-
-  add(
-    "деятельность",
-    user.activities
-  )
-
-  add(
-    "интересы",
-    user.interests
-  )
-
-  add(
-    "музыка",
-    user.music
-  )
-
-  add(
-    "фильмы",
-    user.movies
-  )
-
-  add(
-    "книги",
-    user.books
-  )
-
-  add(
-    "игры",
-    user.games
-  )
-
-  add(
-    "сайт",
-    user.site
-  )
-
-  add(
-    "подписчики",
-    user.followers_count
-  )
-
-  add(
-    "отношения",
-    relationName(
-      user.relation
-    )
-  )
-
-  add(
-    "онлайн",
-    user.last_seen
-      ? formatDate(
-          user.last_seen.time
-        )
-      : ""
-  )
-
-  add(
-    "проверенный профиль",
-    user.verified
-      ? "да"
-      : ""
-  )
-
-  if (
-    user.occupation &&
-    user.occupation.name
-  ) {
-
-    add(
-      "работа",
-      user.occupation.name
-    )
-
-  }
-
-
-  if (
-    user.university_name
-  ) {
-
-    add(
-      "университет",
-      user.university_name
-    )
-
-  }
-
-
-  if (
-    user.faculty_name
-  ) {
-
-    add(
-      "факультет",
-      user.faculty_name
-    )
-
-  }
-
-
-  document.getElementById(
-    "info"
-  ).innerHTML =
-    fields.join("")
-
-
-  document.getElementById(
-    "profile"
-  ).style.display =
-    "block"
-
-  document.getElementById(
-    "tabs"
-  ).style.display =
-    "flex"
-
-}
-
-
-function relationName(
-  value
-) {
-
-  const map = {
-    1: "не женат / не замужем",
-    2: "есть партнер",
-    3: "помолвлен / помолвлена",
-    4: "женат / замужем",
-    5: "все сложно",
-    6: "в активном поиске",
-    7: "влюблен / влюблена"
-  }
-
-  return map[value] || ""
-
-}
-
-
-function empty(
-  text
-) {
-
-  return `
-    <div class="empty">
-      ${escapeHTML(text)}
-    </div>
-  `
-
-}
-
-
-function renderOverview(
-  data
-) {
-
-  const user =
-    data.user || {}
-
-  const blocks = []
-
-  blocks.push(`
-    <div class="card">
-      <b>основные счетчики</b>
-
-      <div class="info">
-
-        <div class="info-row">
-          публикаций:
-          ${data.wallCount ?? "нет данных"}
-        </div>
-
-        <div class="info-row">
-          друзей:
-          ${data.friendsCount ?? "нет данных"}
-        </div>
-
-        <div class="info-row">
-          подписчиков:
-          ${user.followers_count ?? "нет данных"}
-        </div>
-
-        <div class="info-row">
-          подписок:
-          ${data.subscriptionCount ?? "нет данных"}
-        </div>
-
-        <div class="info-row">
-          сообществ:
-          ${data.groupCount ?? "нет данных"}
-        </div>
-
-        <div class="info-row">
-          фотографий:
-          ${data.photoCount ?? "нет данных"}
-        </div>
-
-        <div class="info-row">
-          видео:
-          ${data.videoCount ?? "нет данных"}
-        </div>
-
-        <div class="info-row">
-          аудиозаписей:
-          ${data.audioCount ?? "нет данных"}
-        </div>
-
-        <div class="info-row">
-          документов:
-          ${data.documentCount ?? "нет данных"}
-        </div>
-
-      </div>
-    </div>
-  `)
-
-
-  blocks.push(`
-    <div class="card">
-      <b>публичный цифровой след</b>
-
-      <div class="info">
-
-        <div class="info-row">
-          профиль VK: доступен
-        </div>
-
-        <div class="info-row">
-          публичная стена:
-          ${data.wallAvailable ? "доступна" : "недоступна"}
-        </div>
-
-        <div class="info-row">
-          публичные фотографии:
-          ${data.photosAvailable ? "доступны" : "недоступны"}
-        </div>
-
-        <div class="info-row">
-          публичные видео:
-          ${data.videosAvailable ? "доступны" : "недоступны"}
-        </div>
-
-        <div class="info-row">
-          публичные сообщества:
-          ${data.groupsAvailable ? "доступны" : "недоступны"}
-        </div>
-
-      </div>
-    </div>
-  `)
-
-
-  document.getElementById(
-    "overview"
-  ).innerHTML =
-    blocks.join("")
-
-}
-
-
-function renderAttachment(
-  attachment
-) {
-
-  const container =
-    document.createElement(
-      "div"
-    )
-
-  container.className =
-    "attachment"
-
-
-  if (!attachment) {
-    return container
-  }
-
-
-  if (
-    attachment.type === "photo" &&
-    attachment.photo
-  ) {
-
-    const photo =
-      attachment.photo
-
-    const sizes =
-      photo.sizes || []
-
-    const image =
-      document.createElement(
-        "img"
-      )
-
-    image.src =
-      sizes.length
-        ? sizes[
-            sizes.length - 1
-          ].url
-        : photo.photo_604 ||
-          photo.photo_130 ||
-          ""
-
-    image.alt =
-      photo.text ||
-      "фотография"
-
-    container.appendChild(
-      image
-    )
-
-    return container
-
-  }
-
-
-  if (
-    attachment.type === "video" &&
-    attachment.video
-  ) {
-
-    container.textContent =
-      "видео: " +
-      (
-        attachment.video.title ||
-        "без названия"
-      )
-
-    return container
-
-  }
-
-
-  if (
-    attachment.type === "audio" &&
-    attachment.audio
-  ) {
-
-    container.textContent =
-      "аудио: " +
-      (
-        attachment.audio.artist ||
-        ""
-      ) +
-      " - " +
-      (
-        attachment.audio.title ||
-        ""
-      )
-
-    return container
-
-  }
-
-
-  if (
-    attachment.type === "doc" &&
-    attachment.doc
-  ) {
-
-    container.textContent =
-      "документ: " +
-      (
-        attachment.doc.title ||
-        "без названия"
-      )
-
-    return container
-
-  }
-
-
-  if (
-    attachment.type === "link" &&
-    attachment.link
-  ) {
-
-    const link =
-      attachment.link
-
-    const title =
-      link.title ||
-      link.url ||
-      "ссылка"
-
-    container.textContent =
-      title
-
-    if (link.url) {
-
-      const a =
-        document.createElement(
-          "a"
-        )
-
-      a.href =
-        link.url
-
-      a.target =
-        "_blank"
-
-      a.rel =
-        "noopener noreferrer"
-
-      a.textContent =
-        link.url
-
-      container.appendChild(
-        a
-      )
-
-    }
-
-    return container
-
-  }
-
-
-  container.textContent =
-    "вложение: " +
-    (
-      attachment.type ||
-      "неизвестно"
-    )
-
-  return container
-
-}
-
-
-function renderPost(
-  post
-) {
-
-  const article =
-    document.createElement(
-      "article"
-    )
-
-  article.className =
-    "post"
-
-
-  const date =
-    document.createElement(
-      "div"
-    )
-
-  date.className =
-    "post-date"
-
-  date.textContent =
-    formatDate(
-      post.date
-    )
-
-  article.appendChild(
-    date
-  )
-
-
-  if (post.text) {
-
-    const text =
-      document.createElement(
-        "div"
-      )
-
-    text.className =
-      "post-text"
-
-    text.textContent =
-      post.text
-
-    article.appendChild(
-      text
-    )
-
-  }
-
-
-  if (
-    post.attachments &&
-    post.attachments.length
-  ) {
-
-    post.attachments.forEach(
-      attachment => {
-
-        article.appendChild(
-          renderAttachment(
-            attachment
-          )
-        )
-
-      }
-    )
-
-  }
-
-
-  const stats = []
-
-
-  if (
-    post.likes &&
-    post.likes.count != null
-  ) {
-
-    stats.push(
-      "лайки: " +
-      post.likes.count
-    )
-
-  }
-
-  if (
-    post.comments &&
-    post.comments.count != null
-  ) {
-
-    stats.push(
-      "комментарии: " +
-      post.comments.count
-    )
-
-  }
-
-  if (
-    post.reposts &&
-    post.reposts.count != null
-  ) {
-
-    stats.push(
-      "репосты: " +
-      post.reposts.count
-    )
-
-  }
-
-  if (
-    post.views &&
-    post.views.count != null
-  ) {
-
-    stats.push(
-      "просмотры: " +
-      post.views.count
-    )
-
-  }
-
-
-  if (stats.length) {
-
-    const stat =
-      document.createElement(
-        "div"
-      )
-
-    stat.className =
-      "post-stats"
-
-    stat.textContent =
-      stats.join(
-        " · "
-      )
-
-    article.appendChild(
-      stat
-    )
-
-  }
-
-
-  if (post.id) {
-
-    const link =
-      document.createElement(
-        "a"
-      )
-
-    link.className =
-      "post-link"
-
-    link.target =
-      "_blank"
-
-    link.rel =
-      "noopener noreferrer"
-
-    link.href =
-      "https://vk.com/wall" +
-      currentUserId +
-      "_" +
-      post.id
-
-    link.textContent =
-      "открыть публикацию VK"
-
-    article.appendChild(
-      link
-    )
-
-
-    if (
-      post.comments &&
-      post.comments.count > 0
-    ) {
-
-      const commentsButton =
-        document.createElement(
-          "button"
-        )
-
-      commentsButton.className =
-        "small-button"
-
-      commentsButton.style.marginTop =
-        "10px"
-
-      commentsButton.textContent =
-        "показать комментарии"
-
-      commentsButton.addEventListener(
-        "click",
-        async () => {
-
-          commentsButton.disabled =
-            true
-
-          commentsButton.textContent =
-            "загрузка..."
-
-          await loadComments(
-            post,
-            article
-          )
-
-          commentsButton.remove()
-
-        }
-      )
-
-      article.appendChild(
-        commentsButton
-      )
-
-    }
-
-  }
-
-
-  return article
-
-}
-
-
-async function loadComments(
-  post,
-  article
-) {
-
-  try {
-
-    const result =
-      await callVK(
-        "wall.getComments",
-        {
-          owner_id:
-            Number(
-              currentUserId
-            ),
-
-          post_id:
-            post.id,
-
-          count:
-            100,
-
-          extended:
-            1,
-
-          fields:
-            "photo_50,screen_name"
-        }
-      )
-
-
-    if (
-      !result ||
-      !result.response
-    ) {
-
-      throw new Error(
-        "VK не вернул комментарии"
-      )
-
-    }
-
-
-    const response =
-      result.response
-
-    const items =
-      response.items || []
-
-    const profiles =
-      response.profiles || []
-
-
-    const profileMap =
-      new Map()
-
-    profiles.forEach(
-      profile => {
-
-        profileMap.set(
-          profile.id,
-          profile
-        )
-
-      }
-    )
-
-
-    const block =
-      document.createElement(
-        "div"
-      )
-
-    block.className =
-      "comments"
-
-
-    if (!items.length) {
-
-      block.innerHTML =
-        empty(
-          "публичных комментариев не найдено"
-        )
-
-    }
-
-
-    items.forEach(
-      comment => {
-
-        const profile =
-          profileMap.get(
-            comment.from_id
-          )
-
-        const item =
-          document.createElement(
-            "div"
-          )
-
-        item.className =
-          "comment"
-
-        item.innerHTML = `
-          <div class="comment-name">
-            ${escapeHTML(
-              profile
-                ? (
-                    profile.first_name +
-                    " " +
-                    profile.last_name
-                  )
-                : (
-                    "ID " +
-                    comment.from_id
-                  )
-            )}
-          </div>
-
-          <div class="comment-text">
-            ${escapeHTML(
-              comment.text
-            )}
-          </div>
-
-          <div class="comment-date">
-            ${formatDate(
-              comment.date
-            )}
-          </div>
-        `
-
-        block.appendChild(
-          item
-        )
-
-      }
-    )
-
-
-    article.appendChild(
-      block
-    )
-
-  } catch (error) {
-
-    const block =
-      document.createElement(
-        "div"
-      )
-
-    block.className =
-      "comment"
-
-    block.textContent =
-      "комментарии недоступны: " +
-      error.message
-
-    article.appendChild(
-      block
-    )
-
-  }
-
-}
-
-
-async function loadWall(
-  reset = false
-) {
-
-  if (wallLoading) {
-    return
-  }
-
-  if (
-    wallFinished &&
-    !reset
-  ) {
-    return
-  }
-
-  wallLoading = true
-
-  const wall =
-    document.getElementById(
-      "wall"
-    )
-
-  const more =
-    document.getElementById(
-      "wallMore"
-    )
-
-
-  if (reset) {
-
-    wallOffset = 0
-
-    wallFinished = false
-
-    wall.innerHTML = ""
-
-    more.style.display =
-      "none"
-
-  }
-
-
-  try {
-
-    const result =
-      await callVK(
-        "wall.get",
-        {
-          owner_id:
-            Number(
-              currentUserId
-            ),
-
-          count:
-            10,
-
-          offset:
-            wallOffset,
-
-          filter:
-            "owner"
-        }
-      )
-
-
-    if (
-      !result ||
-      !result.response
-    ) {
-
-      throw new Error(
-        "стена недоступна"
-      )
-
-    }
-
-
-    const response =
-      result.response
-
-    const posts =
-      response.items || []
-
-
-    currentData.wallCount =
-      response.count || 0
-
-    currentData.wallAvailable =
-      true
-
-
-    if (!posts.length) {
-
-      wallFinished = true
-
-      if (
-        wallOffset === 0
-      ) {
-
-        wall.innerHTML =
-          empty(
-            "публичных публикаций не найдено"
-          )
-
-      }
-
-      more.style.display =
-        "none"
-
-      return
-
-    }
-
-
-    posts.forEach(
-      post => {
-
-        wall.appendChild(
-          renderPost(
-            post
-          )
-        )
-
-        collectPostData(
-          post
-        )
-
-      }
-    )
-
-
-    wallOffset +=
-      posts.length
-
-
-    if (
-      posts.length < 10 ||
-      wallOffset >= response.count
-    ) {
-
-      wallFinished = true
-
-      more.style.display =
-        "none"
-
-    } else {
-
-      more.style.display =
-        "block"
-
-    }
-
-
-  } catch (error) {
-
-    currentData.wallAvailable =
-      false
-
-    addLimit(
-      "стена",
-      error.message
-    )
-
-
-    if (
-      wallOffset === 0
-    ) {
-
-      wall.innerHTML =
-        empty(
-          "стена недоступна через API"
-        )
-
-    }
-
-    more.style.display =
-      "none"
-
-  } finally {
-
-    wallLoading = false
-
-  }
-
-}
-
-
-function collectPostData(
-  post
-) {
-
-  if (!currentData.posts) {
-    currentData.posts = []
-  }
-
-  currentData.posts.push(
-    post
-  )
-
-}
-
-
-async function loadPhotos() {
-
-  const albums =
-    document.getElementById(
-      "albums"
-    )
-
-  const photos =
-    document.getElementById(
-      "photos"
-    )
-
-
-  albums.innerHTML =
-    '<div class="loader">загрузка альбомов...</div>'
-
-  photos.innerHTML =
-    ""
-
-
-  try {
-
-    const albumResult =
-      await callVK(
-        "photos.getAlbums",
-        {
-          owner_id:
-            Number(
-              currentUserId
-            ),
-
-          need_system:
-            1,
-
-          need_covers:
-            1,
-
-          count:
-            100
-        }
-      )
-
-
-    const albumItems =
-      albumResult.response &&
-      albumResult.response.items
-        ? albumResult.response.items
-        : []
-
-
-    currentData.albumCount =
-      albumItems.length
-
-
-    if (!albumItems.length) {
-
-      albums.innerHTML =
-        empty(
-          "публичных альбомов не найдено"
-        )
-
-    } else {
-
-      albums.innerHTML =
-        albumItems
-          .map(
-            album => `
-              <div class="album">
-
-                <div class="album-title">
-                  ${escapeHTML(
-                    album.title
-                  )}
-                </div>
-
-                <div class="album-meta">
-                  фотографий:
-                  ${album.size ?? 0}
-                </div>
-
-                ${
-                  album.thumb_src
-                    ? `
-                      <img
-                        src="${escapeHTML(
-                          album.thumb_src
-                        )}"
-                        style="
-                          width:100%;
-                          max-height:300px;
-                          object-fit:cover;
-                          border-radius:10px;
-                        "
-                      >
-                    `
-                    : ""
-                }
-
-              </div>
-            `
-          )
-          .join("")
-
-    }
-
-
-    const photoResult =
-      await callVK(
-        "photos.get",
-        {
-          owner_id:
-            Number(
-              currentUserId
-            ),
-
-          album_id:
-            "wall",
-
-          extended:
-            1,
-
-          count:
-            100,
-
-          photo_sizes:
-            1
-        }
-      )
-
-
-    const items =
-      photoResult.response &&
-      photoResult.response.items
-        ? photoResult.response.items
-        : []
-
-
-    currentData.photoCount =
-      photoResult.response
-        ? photoResult.response.count
-        : items.length
-
-    currentData.photosAvailable =
-      true
-
-
-    if (!items.length) {
-
-      photos.innerHTML =
-        empty(
-          "фотографий со стены не найдено"
-        )
-
-      return
-
-    }
-
-
-    const grid =
-      document.createElement(
-        "div"
-      )
-
-    grid.className =
-      "photo-grid"
-
-
-    items.forEach(
-      photo => {
-
-        const sizes =
-          photo.sizes || []
-
-        const src =
-          sizes.length
-            ? sizes[
-                sizes.length - 1
-              ].url
-            : photo.photo_604 ||
-              photo.photo_130 ||
-              ""
-
-        const img =
-          document.createElement(
-            "img"
-          )
-
-        img.src =
-          src
-
-        img.alt =
-          photo.text ||
-          "фотография"
-
-        img.loading =
-          "lazy"
-
-        grid.appendChild(
-          img
-        )
-
-      }
-    )
-
-
-    photos.appendChild(
-      grid
-    )
-
-
-  } catch (error) {
-
-    currentData.photosAvailable =
-      false
-
-    addLimit(
-      "фотографии",
-      error.message
-    )
-
-    albums.innerHTML =
-      empty(
-        "фотографии недоступны через API"
-      )
-
-  }
-
-}
-
-
-async function loadVideos() {
-
-  const element =
-    document.getElementById(
-      "videos"
-    )
-
-  element.innerHTML =
-    '<div class="loader">загрузка видео...</div>'
-
-
-  try {
-
-    const result =
-      await callVK(
-        "video.get",
-        {
-          owner_id:
-            Number(
-              currentUserId
-            ),
-
-          count:
-            100,
-
-          extended:
-            1
-        }
-      )
-
-
-    const response =
-      result.response || {}
-
-    const items =
-      response.items || []
-
-
-    currentData.videoCount =
-      response.count ??
-      items.length
-
-    currentData.videosAvailable =
-      true
-
-
-    if (!items.length) {
-
-      element.innerHTML =
-        empty(
-          "публичных видео не найдено"
-        )
-
-      return
-
-    }
-
-
-    element.innerHTML = ""
-
-
-    items.forEach(
-      video => {
-
-        const image =
-          video.image &&
-          video.image.length
-            ? video.image[
-                video.image.length - 1
-              ].url
-            : ""
-
-        const card =
-          document.createElement(
-            "div"
-          )
-
-        card.className =
-          "card"
-
-
-        card.innerHTML = `
-          <div class="video-card">
-
-            ${
-              image
-                ? `
-                  <img
-                    class="video-image"
-                    src="${escapeHTML(
-                      image
-                    )}"
-                  >
-                `
-                : `
-                  <div
-                    class="video-image"
-                  ></div>
-                `
-            }
-
-            <div>
-
-              <div class="video-title">
-                ${escapeHTML(
-                  video.title ||
-                  "без названия"
-                )}
-              </div>
-
-              <div class="video-meta">
-
-                дата:
-                ${formatDate(
-                  video.date
-                )}
-
-                <br>
-
-                длительность:
-                ${video.duration ?? 0} сек
-
-                <br>
-
-                просмотры:
-                ${video.views ?? 0}
-
-                <br>
-
-                комментарии:
-                ${
-                  video.comments
-                    ? video.comments.count
-                    : 0
-                }
-
-              </div>
-
-              <a
-                class="post-link"
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://vk.com/video${currentUserId}_${video.id}"
-              >
-                открыть видео
-              </a>
-
-            </div>
-
-          </div>
-        `
-
-        element.appendChild(
-          card
-        )
-
-      }
-    )
-
-
-  } catch (error) {
-
-    currentData.videosAvailable =
-      false
-
-    addLimit(
-      "видео",
-      error.message
-    )
-
-    element.innerHTML =
-      empty(
-        "видео недоступны через API"
-      )
-
-  }
-
-}
-
-
-async function loadAudio() {
-
-  const element =
-    document.getElementById(
-      "audio"
-    )
-
-  element.innerHTML =
-    '<div class="loader">загрузка аудио...</div>'
-
-
-  try {
-
-    const result =
-      await callVK(
-        "audio.get",
-        {
-          owner_id:
-            Number(
-              currentUserId
-            ),
-
-          count:
-            100
-        }
-      )
-
-
-    const response =
-      result.response || {}
-
-    const items =
-      response.items || []
-
-
-    currentData.audioCount =
-      response.count ??
-      items.length
-
-
-    if (!items.length) {
-
-      element.innerHTML =
-        empty(
-          "публичных аудиозаписей не найдено"
-        )
-
-      return
-
-    }
-
-
-    element.innerHTML = ""
-
-
-    items.forEach(
-      audio => {
-
-        const card =
-          document.createElement(
-            "div"
-          )
-
-        card.className =
-          "audio"
-
-        card.innerHTML = `
-          <div class="audio-title">
-            ${escapeHTML(
-              audio.artist ||
-              ""
-            )}
-            -
-            ${escapeHTML(
-              audio.title ||
-              "без названия"
-            )}
-          </div>
-
-          <div class="audio-meta">
-            длительность:
-            ${audio.duration ?? 0} сек
-          </div>
-        `
-
-        element.appendChild(
-          card
-        )
-
-      }
-    )
-
-
-  } catch (error) {
-
-    currentData.audioCount =
-      null
-
-    addLimit(
-      "аудио",
-      error.message
-    )
-
-    element.innerHTML =
-      empty(
-        "аудиозаписи недоступны через API"
-      )
-
-  }
-
-}
-
-
-async function loadDocuments() {
-
-  const element =
-    document.getElementById(
-      "documents"
-    )
-
-  element.innerHTML =
-    '<div class="loader">загрузка документов...</div>'
-
-
-  try {
-
-    const result =
-      await callVK(
-        "docs.get",
-        {
-          owner_id:
-            Number(
-              currentUserId
-            ),
-
-          count:
-            100,
-
-          return_tags:
-            1
-        }
-      )
-
-
-    const response =
-      result.response || {}
-
-    const items =
-      response.items || []
-
-
-    currentData.documentCount =
-      response.count ??
-      items.length
-
-
-    if (!items.length) {
-
-      element.innerHTML =
-        empty(
-          "публичных документов не найдено"
-        )
-
-      return
-
-    }
-
-
-    element.innerHTML = ""
-
-
-    items.forEach(
-      doc => {
-
-        const card =
-          document.createElement(
-            "div"
-          )
-
-        card.className =
-          "document"
-
-        card.innerHTML = `
-          <div class="document-title">
-            ${escapeHTML(
-              doc.title ||
-              "без названия"
-            )}
-          </div>
-
-          <div class="document-meta">
-
-            тип:
-            ${escapeHTML(
-              doc.ext ||
-              "неизвестно"
-            )}
-
-            <br>
-
-            размер:
-            ${doc.size ?? 0} байт
-
-          </div>
-
-          ${
-            doc.url
-              ? `
-                <a
-                  class="post-link"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="${escapeHTML(
-                    doc.url
-                  )}"
-                >
-                  открыть документ
-                </a>
-              `
-              : ""
-          }
-        `
-
-        element.appendChild(
-          card
-        )
-
-      }
-    )
-
-
-  } catch (error) {
-
-    currentData.documentCount =
-      null
-
-    addLimit(
-      "документы",
-      error.message
-    )
-
-    element.innerHTML =
-      empty(
-        "документы недоступны через API"
-      )
-
-  }
-
-}
-
-
-function renderPeople(
-  elementId,
-  items,
-  emptyText
-) {
-
-  const element =
-    document.getElementById(
-      elementId
-    )
-
-
-  if (!items.length) {
-
-    element.innerHTML =
-      empty(
-        emptyText
-      )
-
-    return
-
-  }
-
-
-  element.innerHTML = ""
-
-
-  items.forEach(
-    user => {
-
-      const item =
-        document.createElement(
-          "div"
-        )
-
-      item.className =
-        "person"
-
-
-      const avatar =
-        user.photo_50 ||
-        user.photo_100 ||
-        ""
-
-
-      item.innerHTML = `
-        ${
-          avatar
-            ? `
-              <img
-                class="person-avatar"
-                src="${escapeHTML(
-                  avatar
-                )}"
-              >
-            `
-            : `
-              <div
-                class="person-avatar"
-              ></div>
-            `
-        }
-
-        <div>
-
-          <div class="person-name">
-
-            ${escapeHTML(
-              (
-                `${user.first_name || ""} ` +
-                `${user.last_name || ""}`
-              ).trim() ||
-              (
-                "ID " +
-                user.id
-              )
-            )}
-
-          </div>
-
-          <div class="person-meta">
-
-            ${
-              user.screen_name
-                ? "@" +
-                  escapeHTML(
-                    user.screen_name
-                  )
-                : "ID " +
-                  user.id
-            }
-
-          </div>
-
-        </div>
-      `
-
-      element.appendChild(
-        item
-      )
-
-    }
-  )
-
-}
-
-
-async function loadFriends() {
-
-  const element =
-    document.getElementById(
-      "friends"
-    )
-
-  element.innerHTML =
-    '<div class="loader">загрузка друзей...</div>'
-
-
-  try {
-
-    const result =
-      await callVK(
-        "friends.get",
-        {
-          user_id:
-            Number(
-              currentUserId
-            ),
-
-          order:
-            "hints",
-
-          count:
-            100,
-
-          fields:
-            "photo_50,screen_name,city"
-        }
-      )
-
-
-    const response =
-      result.response || {}
-
-    const items =
-      response.items || []
-
-
-    currentData.friendsCount =
-      response.count ??
-      items.length
-
-
-    renderPeople(
-      "friends",
-      items,
-      "публичных друзей не найдено"
-    )
-
-
-  } catch (error) {
-
-    currentData.friendsCount =
-      null
-
-    addLimit(
-      "друзья",
-      error.message
-    )
-
-    document.getElementById(
-      "friends"
-    ).innerHTML =
-      empty(
-        "список друзей недоступен через API"
-      )
-
-  }
-
-}
-
-
-async function loadFollowers() {
-
-  const element =
-    document.getElementById(
-      "followers"
-    )
-
-  element.innerHTML =
-    '<div class="loader">загрузка подписчиков...</div>'
-
-
-  try {
-
-    const result =
-      await callVK(
-        "users.getFollowers",
-        {
-          user_id:
-            Number(
-              currentUserId
-            ),
-
-          count:
-            100,
-
-          fields:
-            "photo_50,screen_name"
-        }
-      )
-
-
-    const response =
-      result.response || {}
-
-    const items =
-      response.items || []
-
-
-    currentData.followerCount =
-      response.count ??
-      items.length
-
-
-    renderPeople(
-      "followers",
-      items,
-      "публичных подписчиков не найдено"
-    )
-
-
-  } catch (error) {
-
-    currentData.followerCount =
-      null
-
-    addLimit(
-      "подписчики",
-      error.message
-    )
-
-    document.getElementById(
-      "followers"
-    ).innerHTML =
-      empty(
-        "подписчики недоступны через API"
-      )
-
-  }
-
-}
-
-
-async function loadSubscriptions() {
-
-  const element =
-    document.getElementById(
-      "subscriptions"
-    )
-
-  element.innerHTML =
-    '<div class="loader">загрузка подписок...</div>'
-
-
-  try {
-
-    const result =
-      await callVK(
-        "users.getSubscriptions",
-        {
-          user_id:
-            Number(
-              currentUserId
-            ),
-
-          extended:
-            1,
-
-          count:
-            100,
-
-          fields:
-            "photo_50,screen_name"
-        }
-      )
-
-
-    const response =
-      result.response || {}
-
-    const users =
-      response.users &&
-      response.users.items
-        ? response.users.items
-        : []
-
-
-    const groups =
-      response.groups &&
-      response.groups.items
-        ? response.groups.items
-        : []
-
-
-    const total =
-      (
-        response.users
-          ? response.users.count || 0
-          : 0
-      ) +
-      (
-        response.groups
-          ? response.groups.count || 0
-          : 0
-      )
-
-
-    currentData.subscriptionCount =
-      total
-
-
-    element.innerHTML = ""
-
-
-    if (
-      !users.length &&
-      !groups.length
-    ) {
-
-      element.innerHTML =
-        empty(
-          "подписок не найдено"
-        )
-
-      return
-
-    }
-
-
-    users.forEach(
-      user => {
-
-        const item =
-          document.createElement(
-            "div"
-          )
-
-        item.className =
-          "person"
-
-        item.innerHTML = `
           <img
-            class="person-avatar"
-            src="${escapeHTML(
-              user.photo_50 ||
+            class="avatar"
+            src="${escapeHtml(
+              user.photo_200 ||
+              user.photo_400_orig ||
               ""
             )}"
           >
 
-          <div>
+          <div class="profile-info">
 
-            <div class="person-name">
-              ${escapeHTML(
-                (
-                  `${user.first_name || ""} ` +
-                  `${user.last_name || ""}`
-                ).trim()
+            <div class="name">
+
+              ${escapeHtml(
+                (user.first_name || "") +
+                " " +
+                (user.last_name || "")
               )}
-            </div>
-
-            <div class="person-meta">
-              пользователь
-            </div>
-
-          </div>
-        `
-
-        element.appendChild(
-          item
-        )
-
-      }
-    )
-
-
-    groups.forEach(
-      group => {
-
-        const item =
-          document.createElement(
-            "div"
-          )
-
-        item.className =
-          "community"
-
-        item.innerHTML = `
-          <img
-            src="${escapeHTML(
-              group.photo_50 ||
-              group.photo_100 ||
-              ""
-            )}"
-          >
-
-          <div>
-
-            <div class="community-name">
-              ${escapeHTML(
-                group.name
-              )}
-            </div>
-
-            <div class="community-meta">
-              сообщество
-            </div>
-
-          </div>
-        `
-
-        element.appendChild(
-          item
-        )
-
-      }
-    )
-
-
-  } catch (error) {
-
-    currentData.subscriptionCount =
-      null
-
-    addLimit(
-      "подписки",
-      error.message
-    )
-
-    element.innerHTML =
-      empty(
-        "подписки недоступны через API"
-      )
-
-  }
-
-}
-
-
-async function loadGroups() {
-
-  const element =
-    document.getElementById(
-      "groups"
-    )
-
-  element.innerHTML =
-    '<div class="loader">загрузка сообществ...</div>'
-
-
-  try {
-
-    const result =
-      await callVK(
-        "groups.get",
-        {
-          user_id:
-            Number(
-              currentUserId
-            ),
-
-          extended:
-            1,
-
-          count:
-            100,
-
-          fields:
-            "description,activity,site,verified"
-        }
-      )
-
-
-    const response =
-      result.response || {}
-
-    const items =
-      response.items || []
-
-
-    currentData.groupCount =
-      response.count ??
-      items.length
-
-    currentData.groupsAvailable =
-      true
-
-
-    if (!items.length) {
-
-      element.innerHTML =
-        empty(
-          "доступных сообществ не найдено"
-        )
-
-      return
-
-    }
-
-
-    element.innerHTML = ""
-
-
-    items.forEach(
-      group => {
-
-        const item =
-          document.createElement(
-            "div"
-          )
-
-        item.className =
-          "community"
-
-        item.innerHTML = `
-          <img
-            src="${escapeHTML(
-              group.photo_100 ||
-              group.photo_50 ||
-              ""
-            )}"
-          >
-
-          <div>
-
-            <div class="community-name">
-              ${escapeHTML(
-                group.name
-              )}
-            </div>
-
-            <div class="community-meta">
-
-              ID:
-              ${group.id}
 
               ${
-                group.verified
-                  ? " · подтверждено"
+                user.verified
+                  ? `<span class="verified">верифицирован</span>`
                   : ""
               }
 
             </div>
 
+            <div class="screen">
+              @${escapeHtml(
+                user.screen_name ||
+                ("id" + user.id)
+              )}
+            </div>
+
             ${
-              group.activity
-                ? `
-                  <div class="community-meta">
-                    ${escapeHTML(
-                      group.activity
-                    )}
-                  </div>
-                `
+              online
+                ? `<div class="online">● сейчас онлайн</div>`
+                : ""
+            }
+
+            ${
+              user.status
+                ? `<div class="bio">${escapeHtml(user.status)}</div>`
                 : ""
             }
 
           </div>
-        `
 
-        element.appendChild(
-          item
-        )
+        </div>
 
-      }
-    )
-
-
-  } catch (error) {
-
-    currentData.groupCount =
-      null
-
-    currentData.groupsAvailable =
-      false
-
-    addLimit(
-      "сообщества",
-      error.message
-    )
-
-    element.innerHTML =
-      empty(
-        "список сообществ недоступен через API"
-      )
-
-  }
-
-}
-
-
-function collectLinksAndMentions() {
-
-  const links =
-    new Set()
-
-  const mentions =
-    new Set()
-
-
-  const sources = []
-
-
-  if (currentUser) {
-
-    if (currentUser.site) {
-
-      sources.push(
-        currentUser.site
-      )
-
-    }
-
-    if (currentUser.status) {
-
-      sources.push(
-        currentUser.status
-      )
-
-    }
-
-    if (currentUser.about) {
-
-      sources.push(
-        currentUser.about
-      )
-
-    }
-
-  }
-
-
-  ;(
-    currentData.posts || []
-  ).forEach(
-    post => {
-
-      sources.push(
-        post.text || ""
-      )
-
-    }
-  )
-
-
-  sources.forEach(
-    text => {
-
-      const foundLinks =
-        text.match(
-          /https?:\/\/[^\s<>"']+/gi
-        ) || []
-
-
-      foundLinks.forEach(
-        link => {
-
-          links.add(
-            link.replace(
-              /[),.;!?]+$/,
-              ""
-            )
-          )
-
+        ${
+          user.about
+            ? `
+              <div style="margin-top:14px">
+                <div class="label">о себе</div>
+                <div class="bio">${escapeHtml(user.about)}</div>
+              </div>
+            `
+            : ""
         }
-      )
 
+        <div class="grid">
 
-      const foundMentions =
-        text.match(
-          /@[a-zA-Z0-9_.]+/g
-        ) || []
+          ${field("VK ID", user.id)}
 
+          ${field(
+            "ссылка",
+            "https://vk.com/" +
+            (user.screen_name || ("id" + user.id))
+          )}
 
-      foundMentions.forEach(
-        mention => {
+          ${field(
+            "пол",
+            sexText(user.sex)
+          )}
 
-          mentions.add(
-            mention
-          )
+          ${field(
+            "дата рождения",
+            user.bdate
+          )}
 
-        }
-      )
+          ${field(
+            "город",
+            user.city && user.city.title
+          )}
 
-    }
-  )
+          ${field(
+            "страна",
+            user.country && user.country.title
+          )}
 
+          ${field(
+            "подписчики",
+            user.followers_count
+          )}
 
-  const linksElement =
-    document.getElementById(
-      "links"
-    )
+          ${field(
+            "семейное положение",
+            relationText(user.relation)
+          )}
 
-  const mentionsElement =
-    document.getElementById(
-      "mentions"
-    )
+          ${field(
+            "деятельность",
+            user.activities
+          )}
 
+          ${field(
+            "интересы",
+            user.interests
+          )}
 
-  if (!links.size) {
+          ${field(
+            "любимые книги",
+            user.books
+          )}
 
-    linksElement.innerHTML =
-      empty(
-        "ссылок не найдено"
-      )
+          ${field(
+            "любимые фильмы",
+            user.movies
+          )}
 
-  } else {
+          ${field(
+            "любимая музыка",
+            user.music
+          )}
 
-    linksElement.innerHTML = ""
+          ${field(
+            "любимые игры",
+            user.games
+          )}
 
-    links.forEach(
-      link => {
+          ${field(
+            "сайт",
+            user.site
+          )}
 
-        const item =
-          document.createElement(
-            "a"
-          )
+          ${field(
+            "занятость",
+            occupationText(user)
+          )}
 
-        item.className =
-          "link-item"
+          ${field(
+            "последняя активность",
+            user.last_seen
+              ? formatDate(user.last_seen.time)
+              : ""
+          )}
 
-        item.href =
-          link
+        </div>
 
-        item.target =
-          "_blank"
+      </div>
+    `
 
-        item.rel =
-          "noopener noreferrer"
+    document.getElementById("overview").innerHTML = `
+      <div class="card">
+        <h3 style="margin-top:0">основная информация</h3>
 
-        item.textContent =
-          link
+        <div class="grid">
 
-        linksElement.appendChild(
-          item
-        )
+          ${field("имя", user.first_name)}
 
-      }
-    )
+          ${field("фамилия", user.last_name)}
 
+          ${field("VK ID", user.id)}
+
+          ${field(
+            "screen name",
+            user.screen_name
+          )}
+
+          ${field(
+            "город",
+            user.city && user.city.title
+          )}
+
+          ${field(
+            "страна",
+            user.country && user.country.title
+          )}
+
+          ${field(
+            "пол",
+            sexText(user.sex)
+          )}
+
+          ${field(
+            "дата рождения",
+            user.bdate
+          )}
+
+          ${field(
+            "подписчики",
+            user.followers_count
+          )}
+
+          ${field(
+            "семейное положение",
+            relationText(user.relation)
+          )}
+
+        </div>
+      </div>
+    `
   }
 
+  async function loadWall(userId) {
 
-  if (!mentions.size) {
+    try {
 
-    mentionsElement.innerHTML =
-      empty(
-        "упоминаний не найдено"
-      )
-
-  } else {
-
-    mentionsElement.innerHTML = ""
-
-    mentions.forEach(
-      mention => {
-
-        const item =
-          document.createElement(
-            "div"
-          )
-
-        item.className =
-          "mention"
-
-        item.textContent =
-          mention
-
-        mentionsElement.appendChild(
-          item
-        )
-
-      }
-    )
-
-  }
-
-}
-
-
-function renderTimeline() {
-
-  const element =
-    document.getElementById(
-      "timeline"
-    )
-
-
-  const events = []
-
-
-  ;(
-    currentData.posts || []
-  ).forEach(
-    post => {
-
-      events.push({
-        date:
-          post.date,
-
-        text:
-          post.text
-            ? post.text.slice(
-                0,
-                180
-              )
-            : "публикация без текста"
+      const result = await api("wall.get", {
+        owner_id: userId,
+        count: 100
       })
 
-    }
-  )
+      const posts = result.items || []
 
+      if (!posts.length) {
+        return `<div class="empty">публичных записей не найдено</div>`
+      }
 
-  if (
-    currentUser &&
-    currentUser.bdate
-  ) {
+      return posts.map(post => {
 
-    events.push({
-      date: 0,
+        const text = post.text || "без текста"
 
-      text:
-        "указана публичная дата рождения: " +
-        currentUser.bdate
-    })
+        return `
+          <div class="post">
 
-  }
-
-
-  events.sort(
-    (
-      a,
-      b
-    ) =>
-      (b.date || 0) -
-      (a.date || 0)
-  )
-
-
-  if (!events.length) {
-
-    element.innerHTML =
-      empty(
-        "данных для таймлайна пока нет"
-      )
-
-    return
-
-  }
-
-
-  element.innerHTML = ""
-
-
-  events.forEach(
-    event => {
-
-      const item =
-        document.createElement(
-          "div"
-        )
-
-      item.className =
-        "timeline-item"
-
-
-      item.innerHTML = `
-        <div class="timeline-date">
-          ${
-            event.date
-              ? formatDate(
-                  event.date
-                )
-              : "профиль"
-          }
-        </div>
-
-        <div class="timeline-content">
-          ${escapeHTML(
-            event.text
-          )}
-        </div>
-      `
-
-      element.appendChild(
-        item
-      )
-
-    }
-  )
-
-}
-
-
-function saveSnapshot() {
-
-  if (!currentUser) {
-    return
-  }
-
-
-  const key =
-    "vk_analyzer_history_" +
-    currentUser.id
-
-
-  let history = []
-
-
-  try {
-
-    history =
-      JSON.parse(
-        localStorage.getItem(
-          key
-        ) || "[]"
-      )
-
-  } catch {
-
-    history = []
-
-  }
-
-
-  const snapshot = {
-
-    date:
-      new Date().toISOString(),
-
-    id:
-      currentUser.id,
-
-    name:
-      (
-        `${currentUser.first_name || ""} ` +
-        `${currentUser.last_name || ""}`
-      ).trim(),
-
-    followers:
-      currentUser.followers_count ??
-      null,
-
-    friends:
-      currentData.friendsCount ??
-      null,
-
-    groups:
-      currentData.groupCount ??
-      null,
-
-    posts:
-      currentData.wallCount ??
-      null
-
-  }
-
-
-  history.unshift(
-    snapshot
-  )
-
-
-  history =
-    history.slice(
-      0,
-      50
-    )
-
-
-  localStorage.setItem(
-    key,
-    JSON.stringify(
-      history
-    )
-  )
-
-}
-
-
-function renderHistory() {
-
-  const element =
-    document.getElementById(
-      "history"
-    )
-
-
-  if (!currentUser) {
-
-    element.innerHTML =
-      empty(
-        "история пока пуста"
-      )
-
-    return
-
-  }
-
-
-  const key =
-    "vk_analyzer_history_" +
-    currentUser.id
-
-
-  let history = []
-
-
-  try {
-
-    history =
-      JSON.parse(
-        localStorage.getItem(
-          key
-        ) || "[]"
-      )
-
-  } catch {
-
-    history = []
-
-  }
-
-
-  if (!history.length) {
-
-    element.innerHTML =
-      empty(
-        "это первое сохраненное наблюдение"
-      )
-
-    return
-
-  }
-
-
-  element.innerHTML = ""
-
-
-  history.forEach(
-    snapshot => {
-
-      const item =
-        document.createElement(
-          "div"
-        )
-
-      item.className =
-        "history-item"
-
-
-      item.innerHTML = `
-        <div class="history-date">
-          ${escapeHTML(
-            new Date(
-              snapshot.date
-            ).toLocaleString(
-              "ru-RU"
-            )
-          )}
-        </div>
-
-        <div>
-          подписчики:
-          ${snapshot.followers ?? "—"}
-        </div>
-
-        <div>
-          друзья:
-          ${snapshot.friends ?? "—"}
-        </div>
-
-        <div>
-          сообщества:
-          ${snapshot.groups ?? "—"}
-        </div>
-
-        <div>
-          публикации:
-          ${snapshot.posts ?? "—"}
-        </div>
-      `
-
-      element.appendChild(
-        item
-      )
-
-    }
-  )
-
-}
-
-
-function renderLimits() {
-
-  const element =
-    document.getElementById(
-      "limits"
-    )
-
-
-  const allLimits = [
-    {
-      title:
-        "общие ограничения",
-
-      text:
-        "приложение видит только данные, которые VK возвращает через API и которые доступны публично для конкретного профиля"
-    },
-
-    {
-      title:
-        "скрытые данные",
-
-      text:
-        "закрытые сообщения, пароли, cookies, access token другого пользователя, историю браузера и приватные материалы приложение не получает"
-    },
-
-    {
-      title:
-        "история",
-
-      text:
-        "исторические изменения начинают собираться только после того, как это приложение само выполнит анализ и сохранит снимок"
-    },
-
-    {
-      title:
-        "внешние аккаунты",
-
-      text:
-        "одинаковый username на другом сайте сам по себе не доказывает принадлежность аккаунта тому же человеку"
-    }
-  ]
-
-
-  const merged =
-    allLimits.concat(
-      limits.map(
-        item => ({
-          title:
-            item.title,
-
-          text:
-            item.text
-        })
-      )
-    )
-
-
-  element.innerHTML =
-    merged
-      .map(
-        item => `
-          <div class="limit">
-
-            <b>
-              ${escapeHTML(
-                item.title
+            <div class="post-date">
+              ${escapeHtml(
+                formatDate(post.date)
               )}
-            </b>
+            </div>
 
-            <br>
+            <div class="post-text">
+              ${escapeHtml(text)}
+            </div>
 
-            ${escapeHTML(
-              item.text
-            )}
+            <div class="post-stats">
+
+              <span>
+                просмотры: ${
+                  post.views
+                    ? post.views.count
+                    : "0"
+                }
+              </span>
+
+              <span>
+                лайки: ${
+                  post.likes
+                    ? post.likes.count
+                    : "0"
+                }
+              </span>
+
+              <span>
+                комментарии: ${
+                  post.comments
+                    ? post.comments.count
+                    : "0"
+                }
+              </span>
+
+              <span>
+                репосты: ${
+                  post.reposts
+                    ? post.reposts.count
+                    : "0"
+                }
+              </span>
+
+            </div>
 
           </div>
         `
-      )
-      .join("")
 
-}
+      }).join("")
 
+    } catch (error) {
 
-async function analyzeProfile() {
+      console.error("wall", error)
 
-  const button =
-    document.getElementById(
-      "analyzeButton"
-    )
-
-
-  button.disabled =
-    true
-
-
-  clearLimits()
-
-
-  currentData =
-    {
-      posts: []
+      return `
+        <div class="empty">
+          не удалось получить стену<br><br>
+          ${escapeHtml(error.message)}
+        </div>
+      `
     }
-
-
-  document.getElementById(
-    "profile"
-  ).style.display =
-    "none"
-
-
-  document.getElementById(
-    "tabs"
-  ).style.display =
-    "none"
-
-
-  try {
-
-    if (!vkReady) {
-
-      throw new Error(
-        "VK Bridge еще не готов"
-      )
-
-    }
-
-
-    const userId =
-      getUserId(
-        document.getElementById(
-          "profileUrl"
-        ).value
-      )
-
-
-    if (!userId) {
-
-      throw new Error(
-        "не указана ссылка на профиль"
-      )
-
-    }
-
-
-    currentUserId =
-      userId
-
-
-    setStatus(
-      "получаю профиль..."
-    )
-
-
-    const profileResult =
-      await callVK(
-        "users.get",
-        {
-          user_ids:
-            userId,
-
-          fields: [
-            "photo_200",
-            "photo_100",
-            "city",
-            "country",
-            "bdate",
-            "sex",
-            "status",
-            "about",
-            "activities",
-            "interests",
-            "books",
-            "movies",
-            "music",
-            "games",
-            "site",
-            "followers_count",
-            "verified",
-            "last_seen",
-            "occupation",
-            "relation",
-            "contacts",
-            "education",
-            "universities",
-            "schools",
-            "screen_name"
-          ].join(",")
-        }
-      )
-
-
-    if (
-      !profileResult ||
-      !profileResult.response ||
-      !profileResult.response.length
-    ) {
-
-      throw new Error(
-        "VK не вернул данные пользователя"
-      )
-
-    }
-
-
-    currentUser =
-      profileResult.response[0]
-
-
-    renderProfile(
-      currentUser
-    )
-
-
-    setStatus(
-      "собираю публичные данные..."
-    )
-
-
-    document.getElementById(
-      "wall"
-    ).innerHTML =
-      '<div class="loader">загрузка...</div>'
-
-
-    const results =
-      await Promise.allSettled(
-        [
-          loadWall(true),
-
-          loadPhotos(),
-
-          loadVideos(),
-
-          loadAudio(),
-
-          loadDocuments(),
-
-          loadFriends(),
-
-          loadFollowers(),
-
-          loadSubscriptions(),
-
-          loadGroups()
-        ]
-      )
-
-
-    results.forEach(
-      result => {
-
-        if (
-          result.status ===
-          "rejected"
-        ) {
-
-          console.error(
-            result.reason
-          )
-
-        }
-
-      }
-    )
-
-
-    collectLinksAndMentions()
-
-    renderTimeline()
-
-    saveSnapshot()
-
-    renderHistory()
-
-    renderOverview(
-      currentData
-    )
-
-    renderLimits()
-
-    showSection(
-      "overview"
-    )
-
-
-    setStatus(
-      "анализ завершен"
-    )
-
-
-  } catch (error) {
-
-    console.error(
-      "PROFILE ERROR",
-      error
-    )
-
-
-    setStatus(
-      error.message ||
-      JSON.stringify(
-        error
-      ),
-      true
-    )
-
-
-  } finally {
-
-    button.disabled =
-      false
-
   }
 
-}
+  async function loadPhotos(userId) {
 
+    try {
 
-document
-  .getElementById(
-    "analyzeButton"
-  )
-  .addEventListener(
+      const result = await api("photos.get", {
+        owner_id: userId,
+        album_id: "wall",
+        count: 100,
+        extended: 1
+      })
+
+      const items = result.items || []
+
+      if (!items.length) {
+        return `<div class="empty">фотографии не найдены</div>`
+      }
+
+      return `
+        <div class="card">
+
+          <div class="photo-grid">
+
+            ${items.map(photo => `
+              <img
+                src="${escapeHtml(
+                  photo.sizes &&
+                  photo.sizes.length
+                    ? photo.sizes[photo.sizes.length - 1].url
+                    : ""
+                )}"
+                loading="lazy"
+              >
+            `).join("")}
+
+          </div>
+
+        </div>
+      `
+
+    } catch (error) {
+
+      console.error("photos", error)
+
+      return `
+        <div class="empty">
+          фотографии недоступны через API
+        </div>
+      `
+    }
+  }
+
+  async function loadVideos(userId) {
+
+    try {
+
+      const result = await api("video.get", {
+        owner_id: userId,
+        count: 100
+      })
+
+      const items = result.items || []
+
+      if (!items.length) {
+        return `<div class="empty">видео не найдены</div>`
+      }
+
+      return `
+        <div class="list">
+
+          ${items.map(video => `
+            <div class="list-item">
+
+              <div class="list-main">
+
+                <div class="list-name">
+                  ${escapeHtml(
+                    video.title || "без названия"
+                  )}
+                </div>
+
+                <div class="list-sub">
+
+                  ${escapeHtml(
+                    formatDate(video.date)
+                  )}
+
+                  · просмотры:
+                  ${video.views || 0}
+
+                </div>
+
+              </div>
+
+            </div>
+          `).join("")}
+
+        </div>
+      `
+
+    } catch (error) {
+
+      console.error("videos", error)
+
+      return `
+        <div class="empty">
+          видео недоступны через API
+        </div>
+      `
+    }
+  }
+
+  async function loadAudio(userId) {
+
+    try {
+
+      const result = await api("audio.get", {
+        owner_id: userId,
+        count: 100
+      })
+
+      const items = result.items || []
+
+      if (!items.length) {
+        return `<div class="empty">аудиозаписи не найдены</div>`
+      }
+
+      return `
+        <div class="list">
+
+          ${items.map(audio => `
+            <div class="list-item">
+
+              <div class="list-main">
+
+                <div class="list-name">
+                  ${escapeHtml(
+                    audio.artist || ""
+                  )}
+                  —
+                  ${escapeHtml(
+                    audio.title || ""
+                  )}
+                </div>
+
+              </div>
+
+            </div>
+          `).join("")}
+
+        </div>
+      `
+
+    } catch (error) {
+
+      console.error("audio", error)
+
+      return `
+        <div class="empty">
+          аудиозаписи недоступны через API
+        </div>
+      `
+    }
+  }
+
+  async function loadDocs(userId) {
+
+    try {
+
+      const result = await api("docs.get", {
+        owner_id: userId,
+        count: 100
+      })
+
+      const items = result.items || []
+
+      if (!items.length) {
+        return `<div class="empty">документы не найдены</div>`
+      }
+
+      return `
+        <div class="list">
+
+          ${items.map(doc => `
+            <div class="list-item">
+
+              <div class="list-main">
+
+                <div class="list-name">
+                  ${escapeHtml(
+                    doc.title || "документ"
+                  )}
+                </div>
+
+                <div class="list-sub">
+                  ${escapeHtml(
+                    doc.ext || ""
+                  )}
+                </div>
+
+              </div>
+
+            </div>
+          `).join("")}
+
+        </div>
+      `
+
+    } catch (error) {
+
+      console.error("docs", error)
+
+      return `
+        <div class="empty">
+          документы недоступны через API
+        </div>
+      `
+    }
+  }
+
+  async function loadFriends(userId) {
+
+    try {
+
+      const result = await api("friends.get", {
+        user_id: userId,
+        count: 100,
+        fields: "photo_100,city,screen_name"
+      })
+
+      const items = result.items || []
+
+      if (!items.length) {
+        return `<div class="empty">друзья не найдены или скрыты</div>`
+      }
+
+      return renderPeople(items)
+
+    } catch (error) {
+
+      console.error("friends", error)
+
+      return `
+        <div class="empty">
+          список друзей недоступен
+        </div>
+      `
+    }
+  }
+
+  async function loadFollowers(userId) {
+
+    try {
+
+      const result = await api("users.getFollowers", {
+        user_id: userId,
+        count: 100,
+        fields: "photo_100,screen_name"
+      })
+
+      const items = result.items || []
+
+      if (!items.length) {
+        return `<div class="empty">подписчики не найдены</div>`
+      }
+
+      return renderPeople(items)
+
+    } catch (error) {
+
+      console.error("followers", error)
+
+      return `
+        <div class="empty">
+          подписчики недоступны
+        </div>
+      `
+    }
+  }
+
+  async function loadSubscriptions(userId) {
+
+    try {
+
+      const result = await api("users.getSubscriptions", {
+        user_id: userId,
+        extended: 1,
+        count: 200
+      })
+
+      const users =
+        result.users &&
+        result.users.items
+          ? result.users.items
+          : []
+
+      const groups =
+        result.groups &&
+        result.groups.items
+          ? result.groups.items
+          : []
+
+      let html = ""
+
+      if (users.length) {
+        html += `
+          <div class="card">
+            <h3 style="margin-top:0">
+              пользователи
+            </h3>
+
+            ${renderPeopleInner(users)}
+          </div>
+        `
+      }
+
+      if (groups.length) {
+        html += `
+          <div class="card">
+            <h3 style="margin-top:0">
+              сообщества
+            </h3>
+
+            ${renderGroupsInner(groups)}
+          </div>
+        `
+      }
+
+      return html ||
+        `<div class="empty">подписок не найдено</div>`
+
+    } catch (error) {
+
+      console.error("subscriptions", error)
+
+      return `
+        <div class="empty">
+          подписки недоступны
+        </div>
+      `
+    }
+  }
+
+  async function loadGroups(userId) {
+
+    try {
+
+      const result = await api("groups.get", {
+        user_id: userId,
+        extended: 1,
+        count: 200
+      })
+
+      const groups = result.items || []
+
+      if (!groups.length) {
+        return `
+          <div class="empty">
+            публичные сообщества не найдены
+          </div>
+        `
+      }
+
+      return `
+        <div class="card">
+          ${renderGroupsInner(groups)}
+        </div>
+      `
+
+    } catch (error) {
+
+      console.error("groups", error)
+
+      return `
+        <div class="empty">
+          сообщества недоступны<br><br>
+          ${escapeHtml(error.message)}
+        </div>
+      `
+    }
+  }
+
+  function renderPeople(items) {
+
+    return `
+      <div class="card">
+        <div class="list">
+          ${renderPeopleInner(items)}
+        </div>
+      </div>
+    `
+  }
+
+  function renderPeopleInner(items) {
+
+    return items.map(person => {
+
+      const name =
+        (
+          (person.first_name || "") +
+          " " +
+          (person.last_name || "")
+        ).trim()
+
+      return `
+        <div class="list-item">
+
+          ${
+            person.photo_100
+              ? `
+                <img
+                  class="small-avatar"
+                  src="${escapeHtml(person.photo_100)}"
+                >
+              `
+              : `
+                <div class="small-avatar"></div>
+              `
+          }
+
+          <div class="list-main">
+
+            <div class="list-name">
+              ${escapeHtml(name || "пользователь")}
+            </div>
+
+            <div class="list-sub">
+              ID: ${escapeHtml(person.id)}
+
+              ${
+                person.screen_name
+                  ? " · @" +
+                    escapeHtml(person.screen_name)
+                  : ""
+              }
+
+              ${
+                person.city && person.city.title
+                  ? " · " +
+                    escapeHtml(person.city.title)
+                  : ""
+              }
+            </div>
+
+          </div>
+
+        </div>
+      `
+
+    }).join("")
+  }
+
+  function renderGroupsInner(groups) {
+
+    return `
+      <div class="list">
+
+        ${groups.map(group => {
+
+          const name =
+            group.name ||
+            group.screen_name ||
+            "сообщество"
+
+          const photo =
+            group.photo_100 ||
+            group.photo_200 ||
+            ""
+
+          return `
+            <div class="list-item">
+
+              ${
+                photo
+                  ? `
+                    <img
+                      class="small-avatar"
+                      src="${escapeHtml(photo)}"
+                    >
+                  `
+                  : `
+                    <div class="small-avatar"></div>
+                  `
+              }
+
+              <div class="list-main">
+
+                <div class="list-name">
+                  ${escapeHtml(name)}
+                </div>
+
+                <div class="list-sub">
+                  ID: ${escapeHtml(group.id)}
+                </div>
+
+              </div>
+
+            </div>
+          `
+
+        }).join("")}
+
+      </div>
+    `
+  }
+
+  function extractLinksAndMentions() {
+
+    const texts = []
+
+    if (currentUser) {
+
+      texts.push(
+        currentUser.status || "",
+        currentUser.about || "",
+        currentUser.activities || "",
+        currentUser.interests || "",
+        currentUser.books || "",
+        currentUser.movies || "",
+        currentUser.music || "",
+        currentUser.games || ""
+      )
+    }
+
+    if (currentData.wallPosts) {
+
+      currentData.wallPosts.forEach(post => {
+        texts.push(post.text || "")
+      })
+    }
+
+    const combined = texts.join("\n")
+
+    const urls =
+      combined.match(
+        /https?:\/\/[^\s]+/gi
+      ) || []
+
+    const mentions =
+      combined.match(
+        /@[a-zA-Z0-9_.-]+/g
+      ) || []
+
+    return {
+      urls: [...new Set(urls)],
+      mentions: [...new Set(mentions)]
+    }
+  }
+
+  function renderLinksAndMentions() {
+
+    const data = extractLinksAndMentions()
+
+    document.getElementById("links").innerHTML =
+      data.urls.length
+        ? `
+          <div class="card">
+            <div class="list">
+
+              ${data.urls.map(url => `
+                <div class="list-item">
+
+                  <div class="list-main">
+
+                    <div class="list-name">
+                      ссылка
+                    </div>
+
+                    <div class="list-sub link">
+                      ${escapeHtml(url)}
+                    </div>
+
+                  </div>
+
+                </div>
+              `).join("")}
+
+            </div>
+          </div>
+        `
+        : `<div class="empty">ссылки не найдены</div>`
+
+    document.getElementById("mentions").innerHTML =
+      data.mentions.length
+        ? `
+          <div class="card">
+            <div class="list">
+
+              ${data.mentions.map(mention => `
+                <div class="list-item">
+                  <div class="list-main">
+                    <div class="list-name">
+                      ${escapeHtml(mention)}
+                    </div>
+                  </div>
+                </div>
+              `).join("")}
+
+            </div>
+          </div>
+        `
+        : `<div class="empty">упоминания не найдены</div>`
+  }
+
+  function renderTimeline() {
+
+    const posts =
+      currentData.wallPosts || []
+
+    if (!posts.length) {
+      document.getElementById("timeline").innerHTML =
+        `<div class="empty">данных для таймлайна нет</div>`
+
+      return
+    }
+
+    const sorted =
+      [...posts].sort(
+        (a, b) =>
+          (a.date || 0) -
+          (b.date || 0)
+      )
+
+    document.getElementById("timeline").innerHTML = `
+      <div class="card">
+
+        ${sorted.map(post => `
+          <div style="
+            padding:12px 0;
+            border-bottom:1px solid #eee
+          ">
+
+            <div class="label">
+              ${escapeHtml(
+                formatDate(post.date)
+              )}
+            </div>
+
+            <div>
+              ${escapeHtml(
+                (post.text || "без текста")
+                  .slice(0, 300)
+              )}
+            </div>
+
+          </div>
+        `).join("")}
+
+      </div>
+    `
+  }
+
+  function saveSnapshot() {
+
+    if (!currentUser) {
+      return
+    }
+
+    const key =
+      "vk_analyzer_" +
+      currentUser.id
+
+    snapshotKey = key
+
+    const snapshots =
+      JSON.parse(
+        localStorage.getItem(key) ||
+        "[]"
+      )
+
+    snapshots.push({
+      timestamp: Date.now(),
+      user: currentUser,
+      wallCount:
+        currentData.wallPosts
+          ? currentData.wallPosts.length
+          : 0
+    })
+
+    const limited =
+      snapshots.slice(-20)
+
+    localStorage.setItem(
+      key,
+      JSON.stringify(limited)
+    )
+
+    renderHistory()
+  }
+
+  function renderHistory() {
+
+    if (!snapshotKey) {
+      document.getElementById("history").innerHTML =
+        `<div class="empty">истории пока нет</div>`
+
+      return
+    }
+
+    const snapshots =
+      JSON.parse(
+        localStorage.getItem(snapshotKey) ||
+        "[]"
+      )
+
+    if (!snapshots.length) {
+      document.getElementById("history").innerHTML =
+        `<div class="empty">истории пока нет</div>`
+
+      return
+    }
+
+    document.getElementById("history").innerHTML = `
+      <div class="card">
+
+        <h3 style="margin-top:0">
+          локальные снимки профиля
+        </h3>
+
+        <div class="list">
+
+          ${snapshots
+            .slice()
+            .reverse()
+            .map(snapshot => `
+
+              <div class="list-item">
+
+                <div class="list-main">
+
+                  <div class="list-name">
+                    ${escapeHtml(
+                      new Date(
+                        snapshot.timestamp
+                      ).toLocaleString("ru-RU")
+                    )}
+                  </div>
+
+                  <div class="list-sub">
+                    записей стены:
+                    ${snapshot.wallCount}
+                  </div>
+
+                </div>
+
+              </div>
+
+            `)
+            .join("")}
+
+        </div>
+
+      </div>
+    `
+  }
+
+  async function analyzeProfile() {
+
+    const value = input.value.trim()
+
+    if (!value) {
+
+      setStatus(
+        "сначала вставьте ссылку на профиль VK",
+        "error"
+      )
+
+      return
+    }
+
+    button.disabled = true
+
+    profileCard.innerHTML = ""
+    tabsContainer.style.display = "none"
+
+    document
+      .querySelectorAll(".section")
+      .forEach(section => {
+        section.innerHTML = ""
+      })
+
+    setStatus(
+      "ищу профиль и загружаю данные..."
+    )
+
+    try {
+
+      if (!accessToken) {
+
+        const initialized =
+          await initVK()
+
+        if (!initialized) {
+          return
+        }
+      }
+
+      const user =
+        await resolveUser(value)
+
+      currentUser = user
+
+      currentData = {}
+
+      snapshotKey =
+        "vk_analyzer_" +
+        user.id
+
+      renderProfile(user)
+
+      tabsContainer.style.display = "block"
+
+      setStatus(
+        "профиль найден, загружаю открытые данные...",
+        "success"
+      )
+
+      const results =
+        await Promise.allSettled([
+
+          loadWall(user.id),
+
+          loadPhotos(user.id),
+
+          loadVideos(user.id),
+
+          loadAudio(user.id),
+
+          loadDocs(user.id),
+
+          loadFriends(user.id),
+
+          loadFollowers(user.id),
+
+          loadSubscriptions(user.id),
+
+          loadGroups(user.id)
+
+        ])
+
+      currentData.wallPosts = []
+
+      if (
+        results[0].status === "fulfilled"
+      ) {
+
+        const wallHtml =
+          results[0].value
+
+        document.getElementById("wall").innerHTML =
+          wallHtml
+
+        try {
+
+          const wall =
+            await api("wall.get", {
+              owner_id: user.id,
+              count: 100
+            })
+
+          currentData.wallPosts =
+            wall.items || []
+
+        } catch {}
+
+      } else {
+
+        document.getElementById("wall").innerHTML =
+          `<div class="empty">стена недоступна</div>`
+      }
+
+      document.getElementById("photos").innerHTML =
+        results[1].status === "fulfilled"
+          ? results[1].value
+          : `<div class="empty">фото недоступны</div>`
+
+      document.getElementById("videos").innerHTML =
+        results[2].status === "fulfilled"
+          ? results[2].value
+          : `<div class="empty">видео недоступны</div>`
+
+      document.getElementById("audio").innerHTML =
+        results[3].status === "fulfilled"
+          ? results[3].value
+          : `<div class="empty">аудио недоступны</div>`
+
+      document.getElementById("docs").innerHTML =
+        results[4].status === "fulfilled"
+          ? results[4].value
+          : `<div class="empty">документы недоступны</div>`
+
+      document.getElementById("friends").innerHTML =
+        results[5].status === "fulfilled"
+          ? results[5].value
+          : `<div class="empty">друзья недоступны</div>`
+
+      document.getElementById("followers").innerHTML =
+        results[6].status === "fulfilled"
+          ? results[6].value
+          : `<div class="empty">подписчики недоступны</div>`
+
+      document.getElementById("subscriptions").innerHTML =
+        results[7].status === "fulfilled"
+          ? results[7].value
+          : `<div class="empty">подписки недоступны</div>`
+
+      document.getElementById("groups").innerHTML =
+        results[8].status === "fulfilled"
+          ? results[8].value
+          : `<div class="empty">сообщества недоступны</div>`
+
+      renderLinksAndMentions()
+      renderTimeline()
+      saveSnapshot()
+
+      setStatus(
+        "анализ завершен",
+        "success"
+      )
+
+    } catch (error) {
+
+      console.error(error)
+
+      setStatus(
+        error.message ||
+        "не удалось получить профиль",
+        "error"
+      )
+
+    } finally {
+
+      button.disabled = false
+    }
+  }
+
+  button.addEventListener(
     "click",
     analyzeProfile
   )
 
+  input.addEventListener(
+    "keydown",
+    event => {
 
-document
-  .getElementById(
-    "wallMore"
-  )
-  .addEventListener(
-    "click",
-    async () => {
-
-      const button =
-        document.getElementById(
-          "wallMore"
-        )
-
-      button.disabled =
-        true
-
-      await loadWall(
-        false
-      )
-
-      button.disabled =
-        false
-
-      collectLinksAndMentions()
-
-      renderTimeline()
+      if (event.key === "Enter") {
+        analyzeProfile()
+      }
 
     }
   )
 
+  document
+    .querySelectorAll(".tab")
+    .forEach(tab => {
 
-initVK()
+      tab.addEventListener(
+        "click",
+        () => {
 
+          document
+            .querySelectorAll(".tab")
+            .forEach(item => {
+              item.classList.remove("active")
+            })
+
+          document
+            .querySelectorAll(".section")
+            .forEach(section => {
+              section.classList.remove("active")
+            })
+
+          tab.classList.add("active")
+
+          const target =
+            document.getElementById(
+              tab.dataset.tab
+            )
+
+          if (target) {
+            target.classList.add("active")
+          }
+
+        }
+      )
+
+    })
+
+  initVK()
 
 </script>
 
-
 </body>
-
 </html>
